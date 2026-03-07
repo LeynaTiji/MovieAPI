@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Double
+from sqlalchemy import Column, Integer, String, Boolean, Float, ForeignKey
+from sqlalchemy.orm import relationship
 from .database import Base
 
 class Movie(Base):
@@ -6,6 +7,26 @@ class Movie(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
-    rating = Column(Double, index=True)
+    info = Column(String, index=True)
+    rating = Column(String, index=True)
+    age = Column(String, index=True)
     genre = Column(String, index=True)
+    director = Column(String, index=True)
+    authors = Column(String, index=True)
+    cast = Column(String, index=True)
+    year = Column(Integer, index=True)
+    reviews = relationship("Review", back_populates="movie")
+
+
+class Review(Base):
+    __tablename__ = "reviews"
+
+    id = Column(Integer, primary_key=True, index=True)
+    movie_id = Column(Integer, ForeignKey("movies.id"))
+    critic_name = Column(String, index=True)
+    top_critic = Column(Boolean, index=True)
+    score = Column(Float, index=True)
+    review = Column(String, index=True)
+    movie = relationship("Movie", back_populates="reviews")
+
 

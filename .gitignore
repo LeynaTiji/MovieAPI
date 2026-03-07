@@ -2,4 +2,7 @@ venv/
 __pycache__/
 *.pyc
 
-.movie.db
+*.movie.db
+*.db
+*.sqlite
+*.sqlite3
