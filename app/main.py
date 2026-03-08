@@ -16,6 +16,11 @@ def get_db():
     finally:
         db.close()
 
+#default endpoint
+@app.get("/")
+def root():
+    return {"message": "Movie API is running"}
+
 # update db with created movie
 @app.post("/movies", response_model=schemas.Movie)
 def create_movie(movie: schemas.MovieCreate, db: Session = Depends(get_db)):

@@ -25,7 +25,7 @@ class Review(Base):
     movie_id = Column(Integer, ForeignKey("movies.id"))
     critic_name = Column(String, index=True)
     top_critic = Column(Boolean, index=True)
-    score = Column(Float, index=True)
+    score = Column(String, index=True)
     review = Column(String, index=True)
     movie = relationship("Movie", back_populates="reviews")
 

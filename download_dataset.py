@@ -15,27 +15,34 @@ reviews_csv = f"{path}/rotten_tomatoes_movie_reviews.csv"
 movies_df = pd.read_csv(movies_csv)
 reviews_df = pd.read_csv(reviews_csv)
 
+print(movies_df.columns)
+print(reviews_df.columns)
+
 db: Session = database.SessionLocal()
 
 movie_ids = {}
 #insert movie from dataset into db
 for _, row in movies_df.iterrows():
-    title = row.get("movie_title") or None
-    info = row.get("movie_info") or None
-    rating = row.get("critics_consensus") or None
-    age = row.get("content_rating") or None
-    director = row.get("directors") or None
-    genre = row.get("genres") or None
-    authors = row.get("authors") or None
+
+    title = row.get("title") or None
+    info = row.get("ratingContents") or None
+    rating = row.get("rating") or None
+    age = row.get("ratingContents") or None
+    director = row.get("director") or None
+    genre = row.get("genre") or None
+    authors = row.get("writer") or None
     cast = row.get("actors") or None
 
     #convert date into just year integer
-    year = None
-    if pd.notna(row.get("original_release_date")):
-        year = int(str(row["original_release_date"])[:4])
+    date = row.get("releaseDateStreaming")
+    if pd.notna(date):
+        try:
+            year = pd.to_datetime(date).year
+        except:
+            year = None
 
-    #map rt link to db movie id
-    rt_link = row.get("rotten_tomatoes_link")
+    #map id to db movie id
+    rt_link = row.get("id")
 
     movie = models.Movie(
         title = title,
@@ -59,22 +66,22 @@ db.refresh(movie)
 
 # iterate through reviews csv
 for _, row in reviews_df.iterrows():
-    rt_link = row.get("rotten_tomatoes_link")
+    rt_link = row.get("id")
 
     if rt_link not in movie_ids:
         continue
 
-    #convert date into just year integer
-    score = None
-    if pd.notna(row.get("review_score")):
-        score = int(float(row["review_score"].split("/")[0]))
+    # #convert date into just year integer
+    # score = None
+    # if pd.notna(row.get("originalScore")):
+    #     score = int(float(row["originalScore"].split("/")[0]))
     
     review = models.Review(
         movie_id = movie_ids[rt_link],
-        review=row.get("review_content", "") or None,
-        critic_name = row.get("critic_name", "") or None,
-        top_critic = row.get("top_critic", "") or None,
-        score = score
+        review=row.get("reviewText", "") or None,
+        critic_name = row.get("criticName", "") or None,
+        top_critic = row.get("isTopCritic", "") or None,
+        score = row.get("originalScore", "") or None,
     )
 
     db.add(review)
