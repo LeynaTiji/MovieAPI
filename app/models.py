@@ -7,13 +7,10 @@ class Movie(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
-    info = Column(String, index=True)
-    rating = Column(String, index=True)
     age = Column(String, index=True)
     genre = Column(String, index=True)
     director = Column(String, index=True)
     authors = Column(String, index=True)
-    cast = Column(String, index=True)
     year = Column(Integer, index=True)
     reviews = relationship("Review", back_populates="movie")
 

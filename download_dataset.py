@@ -25,13 +25,10 @@ movie_ids = {}
 for _, row in movies_df.iterrows():
 
     title = row.get("title") or None
-    info = row.get("ratingContents") or None
-    rating = row.get("rating") or None
     age = row.get("ratingContents") or None
     director = row.get("director") or None
     genre = row.get("genre") or None
     authors = row.get("writer") or None
-    cast = row.get("actors") or None
 
     #convert date into just year integer
     date = row.get("releaseDateStreaming")
@@ -46,13 +43,10 @@ for _, row in movies_df.iterrows():
 
     movie = models.Movie(
         title = title,
-        info=info,
-        rating=rating,
         age=age,
         director=director,
         genre=genre,
         authors=authors,
-        cast=cast,
         year=year
     )
 
