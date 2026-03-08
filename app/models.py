@@ -19,7 +19,7 @@ class Review(Base):
     __tablename__ = "reviews"
 
     id = Column(Integer, primary_key=True, index=True)
-    movie_id = Column(Integer, ForeignKey("movies.id"))
+    movie_id = Column(Integer, ForeignKey("movies.id"), index=True)
     critic_name = Column(String, index=True)
     top_critic = Column(Boolean, index=True)
     score = Column(String, index=True)

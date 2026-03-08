@@ -30,6 +30,11 @@ def create_movie(movie: schemas.MovieCreate, db: Session = Depends(get_db)):
     db.refresh(db_movie)
     return db_movie
 
+# limit set to 50 to allow pagination of movies
 @app.get("/movies")
-def get_movies(db: Session = Depends(get_db)):
-    return db.query(models.Movie).all()
+def get_movies(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
+    return db.query(models.Movies).offset(skip).limit(limit).all()
+
+@app.get("/reviews")
+def get_reviews(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
+    return db.query(models.Review).offset(skip).limit(limit).all()
