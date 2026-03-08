@@ -64,11 +64,6 @@ for _, row in reviews_df.iterrows():
 
     if rt_link not in movie_ids:
         continue
-
-    # #convert date into just year integer
-    # score = None
-    # if pd.notna(row.get("originalScore")):
-    #     score = int(float(row["originalScore"].split("/")[0]))
     
     review = models.Review(
         movie_id = movie_ids[rt_link],
