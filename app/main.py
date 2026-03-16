@@ -33,7 +33,7 @@ def root():
 # limit set to 50 to allow pagination of movies
 @app.get("/movies")
 def get_movies(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
-    return db.query(models.Movies).offset(skip).limit(limit).all()
+    return db.query(models.Movie).offset(skip).limit(limit).all()
 
 # limit reviews to 50 per page 
 @app.get("/reviews")
