@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from .database import SessionLocal, engine, Base
 from . import models, schemas
+from .download_dataset import load_dataset
 
 app = FastAPI()
 
@@ -15,6 +16,12 @@ def get_db():
         yield db
     finally:
         db.close()
+
+# automate loading dataset to db
+@app.on_event("startup")
+def startup_event():
+    print("loading dataset...")
+    load_dataset()
 
 #default endpoint
 @app.get("/")
