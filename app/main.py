@@ -1,25 +1,11 @@
-from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from .database import SessionLocal, engine, Base
 from . import models, schemas
-from .download_dataset import load_dataset
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    #create tables automatically
-    models.Base.metadata.create_all(bind=engine)
+app = FastAPI()
 
-    db = SessionLocal()
-
-    # automate loading dataset to db
-    print("loading dataset...")
-    load_dataset(db)
-
-    db.close()
-    yield
-
-app = FastAPI(lifespan=lifespan)
+Base.metadata.create_all(bind=engine)
 
 # create and manage database session
 def get_db():

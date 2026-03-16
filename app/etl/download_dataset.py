@@ -1,13 +1,14 @@
 import kagglehub
 import pandas as pd
-from sqlalchemy.orm import Session
-from app import models, database
+from app import models
+from app.database import SessionLocal
 
-def load_dataset(db):
+def load_dataset():
+
+    print("loading dataset...")
+
     # download latest version of rotten tomatoes dataset from kaggle
     path = kagglehub.dataset_download("stefanoleone992/rotten-tomatoes-movies-and-critic-reviews-dataset")
-
-    print("Path to dataset files:", path)
 
     #csv metadata file paths
     movies_csv = f"{path}/rotten_tomatoes_movies.csv"
@@ -16,16 +17,10 @@ def load_dataset(db):
     movies_df = pd.read_csv(movies_csv)
     reviews_df = pd.read_csv(reviews_csv)
 
-    print(movies_df.columns)
-    print(reviews_df.columns)
+    # print(movies_df.columns)
+    # print(reviews_df.columns)
 
-    #check if database already contains movies
-    movie_count = db.query(models.Movie).count()
-    review_count = db.query(models.Review).count()
-
-    if movie_count > 0 & review_count > 0:
-        print("Database already populated")
-        return
+    db = SessionLocal()
     
     movie_links = {}
     #insert movie from dataset into db
@@ -90,3 +85,7 @@ def load_dataset(db):
     db.refresh(movie_review)
 
     print("Dataset has loaded")
+
+
+if __name__ == "__main__":
+    load_dataset()
