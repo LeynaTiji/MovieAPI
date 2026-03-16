@@ -1,13 +1,25 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from .database import SessionLocal, engine, Base
 from . import models, schemas
 from .download_dataset import load_dataset
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    #create tables automatically
+    models.Base.metadata.create_all(bind=engine)
 
-#create tables automatically
-Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+
+    # automate loading dataset to db
+    print("loading dataset...")
+    load_dataset(db)
+
+    db.close()
+    yield
+
+app = FastAPI(lifespan=lifespan)
 
 # create and manage database session
 def get_db():
@@ -16,13 +28,7 @@ def get_db():
         yield db
     finally:
         db.close()
-
-# automate loading dataset to db
-@app.on_event("startup")
-def startup_event():
-    print("loading dataset...")
-    load_dataset()
-
+          
 #default endpoint
 @app.get("/")
 def root():

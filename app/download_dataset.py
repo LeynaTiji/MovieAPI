@@ -3,23 +3,21 @@ import pandas as pd
 from sqlalchemy.orm import Session
 from app import models, database
 
-def load_dataset():
+def load_dataset(db):
     # download latest version of rotten tomatoes dataset from kaggle
-    path = kagglehub.dataset_download("andrezaza/clapper-massive-rotten-tomatoes-movies-and-reviews")
+    path = kagglehub.dataset_download("stefanoleone992/rotten-tomatoes-movies-and-critic-reviews-dataset")
 
     print("Path to dataset files:", path)
 
     #csv metadata file paths
     movies_csv = f"{path}/rotten_tomatoes_movies.csv"
-    reviews_csv = f"{path}/rotten_tomatoes_movie_reviews.csv"
+    reviews_csv = f"{path}/rotten_tomatoes_critic_reviews.csv"
 
     movies_df = pd.read_csv(movies_csv)
     reviews_df = pd.read_csv(reviews_csv)
 
     print(movies_df.columns)
     print(reviews_df.columns)
-
-    db: Session = database.SessionLocal()
 
     #check if database already contains movies
     movie_count = db.query(models.Movie).count()
@@ -32,15 +30,14 @@ def load_dataset():
     movie_ids = {}
     #insert movie from dataset into db
     for _, row in movies_df.iterrows():
-
-        title = row.get("title") or None
-        age = row.get("ratingContents") or None
-        director = row.get("director") or None
-        genre = row.get("genre") or None
-        authors = row.get("writer") or None
+        title = row.get("movie_title") or None
+        age = row.get("content_rating") or None
+        director = row.get("directors") or None
+        genre = row.get("genres") or None
+        authors = row.get("authors") or None
 
         #convert date into just year integer
-        date = row.get("releaseDateStreaming")
+        date = row.get("original_release_date")
         if pd.notna(date):
             try:
                 year = pd.to_datetime(date).year
@@ -76,13 +73,15 @@ def load_dataset():
         
         review = models.Review(
             movie_id = movie_ids[rt_link],
-            review=row.get("reviewText", "") or None,
-            critic_name = row.get("criticName", "") or None,
-            top_critic = row.get("isTopCritic", "") or None,
-            score = row.get("originalScore", "") or None,
+            review=row.get("review_content", "") or None,
+            critic_name = row.get("critic_name", "") or None,
+            top_critic = row.get("top_critic", "") or None,
+            score = row.get("review_score", "") or None,
         )
 
         db.add(review)
 
     db.commit()
     db.refresh(review)
+
+    print("Dataset has loaded")
