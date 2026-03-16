@@ -21,14 +21,14 @@ def get_db():
 def root():
     return {"message": "Movie API is running"}
 
-# update db with created movie
-@app.post("/movies", response_model=schemas.Movie)
-def create_movie(movie: schemas.MovieCreate, db: Session = Depends(get_db)):
-    db_movie = models.Movie(**movie.dict())
-    db.add(db_movie)
-    db.commit()
-    db.refresh(db_movie)
-    return db_movie
+# # update db with created movie
+# @app.post("/movies", response_model=schemas.Movie)
+# def create_movie(movie: schemas.MovieCreate, db: Session = Depends(get_db)):
+#     db_movie = models.Movie(**movie.dict())
+#     db.add(db_movie)
+#     db.commit()
+#     db.refresh(db_movie)
+#     return db_movie
 
 # limit set to 50 to allow pagination of movies
 @app.get("/movies")
