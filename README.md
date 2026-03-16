@@ -3,7 +3,8 @@ An API that provides movie recommendation endpoints, genre trend analysis, ratin
 
 
 ### How to install the virtual environment using the requirements file
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+chmod +x setup.sh
+./setup.sh
+
+#### To run API
 uvicorn app.main:app --reload
