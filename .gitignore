@@ -4,5 +4,8 @@ __pycache__/
 
 *.movie.db
 *.db
+*.movie.db-journal
 *.sqlite
 *.sqlite3
+
+.pytest_cache
