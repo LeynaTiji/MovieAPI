@@ -44,3 +44,8 @@ def setup_database():
     # deletes tables after tests
     Base.metadata.drop_all(bind=engine)
 
+# configure client to test db
+@pytest.fixture
+def client(setup_database):
+    with TestClient(app) as client:
+        yield client
