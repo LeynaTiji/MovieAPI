@@ -7,11 +7,16 @@ class Movie(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
+    info = Column(String, index=True)
     age = Column(String, index=True)
     genre = Column(String, index=True)
     director = Column(String, index=True)
     authors = Column(String, index=True)
+    actors = Column(String, index=True)
+    rating = Column(String, index=True)
     year = Column(Integer, index=True)
+    link = Column(String, index=True)
+
     reviews = relationship("Review", back_populates="movie")
 
 
@@ -19,9 +24,8 @@ class Review(Base):
     __tablename__ = "reviews"
 
     id = Column(Integer, primary_key=True, index=True)
-    movie_id = Column(Integer, ForeignKey("movies.id"), index=True)
+    movie_link = Column(Integer, ForeignKey("movies.link"), index=True)
     critic_name = Column(String, index=True)
-    top_critic = Column(Boolean, index=True)
     score = Column(String, index=True)
     review = Column(String, index=True)
     movie = relationship("Movie", back_populates="reviews")
