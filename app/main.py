@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from .database import SessionLocal, engine, Base
-from . import models, schemas
+from . import models, schemas, hf_semantic_analysis
 
 app = FastAPI()
 
@@ -76,10 +76,27 @@ def get_movies_id(review_link: str, skip: int = 0, limit: int = 50, db: Session 
     ).offset(skip).limit(limit).all()
 
     if not review:
-        raise HTTPException(status_code=404, detail="Review not found")
+        raise HTTPException(status_code=404, detail="Reviews not found")
     
     return review
 
-# # semantic analysis of reviews for specified movie
-# @app.get("/reviews/semantics/by-id", response_model=list[schemas.Review])
-# def get_review_semantics(movie_id)
+
+# # summary and semantic analysis of reviews for specified movie
+@app.get("/reviews/semantics/by-link", response_model=list[schemas.Review])
+def get_review_semantics(movie_link: int, db: Session = Depends(get_db)):
+    reviews = db.query(models.Review).filter(
+        models.Review.movie_link == movie_link
+    ).all()
+
+    if not review:
+        raise HTTPException(status_code=404, detail="Reviews not found")
+
+    #iterate through reviews to get review text
+    review_texts = [r.review for r in reviews]
+
+    analysis = hf_semantic_analysis.summerise_reviews(review_texts)
+
+    
+
+    
+    
