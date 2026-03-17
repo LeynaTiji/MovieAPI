@@ -81,9 +81,9 @@ def get_movies_id(review_link: str, skip: int = 0, limit: int = 50, db: Session 
     return review
 
 
-# # summary and semantic analysis of reviews for specified movie
-@app.get("/reviews/semantics/by-link", response_model=list[schemas.Review])
-def get_review_semantics(movie_link: int, db: Session = Depends(get_db)):
+# summary and semantic analysis of reviews for specified movie
+@app.get("/reviews/semantics/by-link", response_model=schemas.AI_Review_Analysis)
+def get_review_semantics(movie_link: str, db: Session = Depends(get_db)):
     reviews = db.query(models.Review).filter(
         models.Review.movie_link == movie_link
     ).all()
@@ -91,13 +91,19 @@ def get_review_semantics(movie_link: int, db: Session = Depends(get_db)):
     if not reviews:
         raise HTTPException(status_code=404, detail="Reviews not found")
 
+    movie =  db.query(models.Movie).filter(
+        models.Movie.link == movie_link
+    ).first()
+    
     #iterate through reviews to get review text
-    review_texts = [r.review for r in reviews]
+    review_texts = [r.review for r in reviews if r.review is not None]
 
-    analysis = hf_semantic_analysis.summerise_reviews(review_texts)
+    label, score = hf_semantic_analysis.review_semantics(review_texts)
 
     return schemas.AI_Review_Analysis(
-        sumary = analysis
+        movie=movie,
+        label= label,
+        score=score
     )
 
     

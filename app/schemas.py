@@ -48,8 +48,10 @@ class Movie_Review(Movie):
     model_config = ConfigDict(from_attributes=True)
 
 
-class AI_Review_Analysis(Movie):
-    summary: Optional[str]
+class AI_Review_Analysis(BaseModel):
+    movie: Movie
+    label: Optional[str]
+    score: Optional[float]
 
     model_config = ConfigDict(from_attributes=True)
 

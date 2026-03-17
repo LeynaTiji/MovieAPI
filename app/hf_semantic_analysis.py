@@ -1,18 +1,21 @@
 from transformers import pipeline
 
-# code created referencing https://huggingface.co/docs/transformers/main_classes/pipelines
-# and https://huggingface.co/facebook/bart-large-cnn
+# code created referencing https://huggingface.co/blog/sentiment-analysis-python
 
 # load bart model
-summeriser = pipeline("summarization", model="facebook/bart-large-cnn")
-sentiment_model = pipeline("sentiment-analysis")
+summeriser = pipeline("text-generation", model="gpt2")
+sentiment_model = pipeline("sentiment-analysis", model="distilbert/distilbert-base-uncased-finetuned-sst-2-english")
 
-def summerise_reviews(reviews: list[str]):
+def review_semantics(reviews: list[str]):
 
+    #join all reviews together
     joint_review = " ".join(reviews)
 
-    # summary text of all reviews using model
-    summary = summeriser(joint_review, max_length=200, min_length=50, do_sample=False)[0]["summary_text"]
+    # code created referencing https://huggingface.co/blog/sentiment-analysis-python
+    # sentiment analysis
+    sentiment = sentiment_model(joint_review)[0]
+    label = sentiment["label"]
+    score = sentiment["score"]
 
-    return summary
+    return label, score
 
