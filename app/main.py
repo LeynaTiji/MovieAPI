@@ -60,6 +60,7 @@ def get_movies_id(movie_link: str, db: Session = Depends(get_db)):
     
     return movie
 
+
 #--- Review Endpoints---
 
 # limit reviews to 50 per page 
@@ -78,3 +79,7 @@ def get_movies_id(review_link: str, skip: int = 0, limit: int = 50, db: Session 
         raise HTTPException(status_code=404, detail="Review not found")
     
     return review
+
+# # semantic analysis of reviews for specified movie
+# @app.get("/reviews/semantics/by-id", response_model=list[schemas.Review])
+# def get_review_semantics(movie_id)
