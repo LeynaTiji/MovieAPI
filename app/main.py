@@ -88,13 +88,17 @@ def get_review_semantics(movie_link: int, db: Session = Depends(get_db)):
         models.Review.movie_link == movie_link
     ).all()
 
-    if not review:
+    if not reviews:
         raise HTTPException(status_code=404, detail="Reviews not found")
 
     #iterate through reviews to get review text
     review_texts = [r.review for r in reviews]
 
     analysis = hf_semantic_analysis.summerise_reviews(review_texts)
+
+    return schemas.AI_Review_Analysis(
+        sumary = analysis
+    )
 
     
 
