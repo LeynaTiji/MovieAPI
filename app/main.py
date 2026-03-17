@@ -37,7 +37,7 @@ def get_movies(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
     return db.query(models.Movie).offset(skip).limit(limit).all()
 
 # get movie by id
-@app.get("/movies/{movie_id}")
+@app.get("/movies/by-id")
 def get_movies_id(movie_id: int, db: Session = Depends(get_db)):
     movie = db.query(models.Movie).filter(
         models.Movie.id == movie_id
@@ -49,7 +49,7 @@ def get_movies_id(movie_id: int, db: Session = Depends(get_db)):
     return movie
 
 # get movie by rotten tomatoes link
-@app.get("/movies/{movie_link}")
+@app.get("/movies/by-link")
 def get_movies_id(movie_link: str, db: Session = Depends(get_db)):
     movie =  db.query(models.Movie).filter(
         models.Movie.link == movie_link
@@ -68,7 +68,7 @@ def get_reviews(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
     return db.query(models.Review).offset(skip).limit(limit).all()
 
 # get review by rotten tomatoes movie link
-@app.get("/reviews/{link}")
+@app.get("/reviews/by-link")
 def get_movies_id(link = str, skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
     review = db.query(models.Review).filter(
         models.Review.movie_link == link
