@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from .database import SessionLocal, engine, Base
 from . import models, schemas
@@ -39,16 +39,26 @@ def get_movies(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
 # get movie by id
 @app.get("/movies/{movie_id}")
 def get_movies_id(movie_id: int, db: Session = Depends(get_db)):
-    return db.query(models.Movie).filter(
+    movie = db.query(models.Movie).filter(
         models.Movie.id == movie_id
     ).all()
+    # reference from https://fastapi.tiangolo.com/tutorial/handling-errors/#use-httpexception
+    if not movie:
+        raise HTTPException(status_code=404, detail="Movie not found")
+    
+    return movie
 
 # get movie by rotten tomatoes link
 @app.get("/movies/{movie_link}")
-def get_movies_id(movie_link: int, db: Session = Depends(get_db)):
-    return db.query(models.Movie).filter(
+def get_movies_id(movie_link: str, db: Session = Depends(get_db)):
+    movie =  db.query(models.Movie).filter(
         models.Movie.link == movie_link
     ).all()
+
+    if not movie:
+        raise HTTPException(status_code=404, detail="Movie not found")
+    
+    return movie
 
 #--- Review Endpoints---
 
@@ -58,8 +68,13 @@ def get_reviews(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
     return db.query(models.Review).offset(skip).limit(limit).all()
 
 # get review by rotten tomatoes movie link
-@app.get("/movies/reviews/{link}")
-def get_movies_id(link, skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
-    return db.query(models.Review).filter(
+@app.get("/reviews/{link}")
+def get_movies_id(link = str, skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
+    review = db.query(models.Review).filter(
         models.Review.movie_link == link
     ).offset(skip).limit(limit).all()
+
+    if not review:
+        raise HTTPException(status_code=404, detail="Review not found")
+    
+    return review
