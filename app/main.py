@@ -69,9 +69,9 @@ def get_reviews(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
 
 # get review by rotten tomatoes movie link
 @app.get("/reviews/by-link")
-def get_movies_id(link = str, skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
+def get_movies_id(review_link = str, skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
     review = db.query(models.Review).filter(
-        models.Review.movie_link == link
+        models.Review.movie_link == review_link
     ).offset(skip).limit(limit).all()
 
     if not review:
