@@ -1,8 +1,8 @@
 """create movie and review tables
 
-Revision ID: 4d7fbbda3cb8
+Revision ID: f43c3d698720
 Revises: 
-Create Date: 2026-03-16 18:07:41.374623
+Create Date: 2026-03-17 17:06:14.687540
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '4d7fbbda3cb8'
+revision: str = 'f43c3d698720'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -48,7 +48,7 @@ def upgrade() -> None:
     op.create_index(op.f('ix_movies_year'), 'movies', ['year'], unique=False)
     op.create_table('reviews',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('movie_link', sa.Integer(), nullable=True),
+    sa.Column('movie_link', sa.String(), nullable=True),
     sa.Column('critic_name', sa.String(), nullable=True),
     sa.Column('score', sa.String(), nullable=True),
     sa.Column('review', sa.String(), nullable=True),

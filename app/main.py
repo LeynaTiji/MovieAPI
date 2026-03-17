@@ -32,12 +32,12 @@ def root():
 #--- Movie Endpoints---
 
 # limit set to 50 to allow pagination of movies
-@app.get("/movies")
+@app.get("/movies", response_model=list[schemas.Movie])
 def get_movies(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
     return db.query(models.Movie).offset(skip).limit(limit).all()
 
 # get movie by id
-@app.get("/movies/by-id")
+@app.get("/movies/by-id", response_model=list[schemas.MovieBase])
 def get_movies_id(movie_id: int, db: Session = Depends(get_db)):
     movie = db.query(models.Movie).filter(
         models.Movie.id == movie_id
@@ -49,7 +49,7 @@ def get_movies_id(movie_id: int, db: Session = Depends(get_db)):
     return movie
 
 # get movie by rotten tomatoes link
-@app.get("/movies/by-link")
+@app.get("/movies/by-link", response_model=list[schemas.MovieBase])
 def get_movies_id(movie_link: str, db: Session = Depends(get_db)):
     movie =  db.query(models.Movie).filter(
         models.Movie.link == movie_link
@@ -63,13 +63,13 @@ def get_movies_id(movie_link: str, db: Session = Depends(get_db)):
 #--- Review Endpoints---
 
 # limit reviews to 50 per page 
-@app.get("/reviews")
+@app.get("/reviews", response_model=list[schemas.Review])
 def get_reviews(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
     return db.query(models.Review).offset(skip).limit(limit).all()
 
 # get review by rotten tomatoes movie link
-@app.get("/reviews/by-link")
-def get_movies_id(review_link = str, skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
+@app.get("/reviews/by-link", response_model=list[schemas.Review])
+def get_movies_id(review_link: str, skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
     review = db.query(models.Review).filter(
         models.Review.movie_link == review_link
     ).offset(skip).limit(limit).all()
