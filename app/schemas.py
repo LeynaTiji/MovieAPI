@@ -9,18 +9,28 @@ class MovieBase(BaseModel):
     genre: Optional[str]
     director: Optional[str]
     authors: Optional[str]
-    cast: Optional[str]
+    actors: Optional[str]
     year: Optional[int]
+    link: Optional[str]
+
+    model_config = ConfigDict(from_attributes=True)
 
 class MovieCreate(MovieBase):
     pass
 
+class Movie(MovieCreate):
+    id: int
+
+    model_config = ConfigDict(from_attributes=True)
+
 
 class ReviewBase(BaseModel):
     critic_name: Optional[str]
-    top_critic: Optional[bool]
-    score: Optional[int]
+    movie_link: Optional[str]
+    score: Optional[str]
     review: Optional[str]
+
+    model_config = ConfigDict(from_attributes=True)
 
 class ReviewCreate(ReviewBase):
     movie_id: int
@@ -30,9 +40,18 @@ class Review(ReviewBase):
 
     model_config = ConfigDict(from_attributes=True)
 
-class Movie(MovieCreate):
-    id: int
+class Movie_Review(Movie):
+    
     #nest revies inside movies
     reviews: List[Review] = []
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class AI_Review_Analysis(BaseModel):
+    movie: Movie
+    label: Optional[str]
+    score: Optional[float]
+
+    model_config = ConfigDict(from_attributes=True)
+
