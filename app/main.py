@@ -6,7 +6,7 @@ from .database import SessionLocal, engine, Base
 from typing import Optional
 from collections import defaultdict
 
-from . import models, schemas, hf_semantic_analysis
+from . import models, schemas, hf_semantic_analysis, genre_analysis
 
 app = FastAPI()
 
@@ -68,7 +68,7 @@ def get_movies_id(movie_link: str, db: Session = Depends(get_db)):
     return movie
 
 # analyse genre trends and popularity over the years
-app.get("/movies/genre/trend", response_model=)
+@app.get("/movies/genre/trend")
 def get_genre_analysis(start_year: Optional[int] = Query(None, description="Filter from this year"), end_year: Optional[int] = Query(None, description="Filter to this year"), db: Session = Depends(get_db)):
 
     # build query of number of movies by genre and year where they don't equal none
@@ -81,10 +81,10 @@ def get_genre_analysis(start_year: Optional[int] = Query(None, description="Filt
     
     #apply filters if passed in
     if start_year:
-        filtered_movies = query.filter(models.Movie.year >= start_year)
+        query = query.filter(models.Movie.year >= start_year)
     if end_year:
-        filtered_movies = query.filter(models.Movie.year <= end_year)
-
+        query = query.filter(models.Movie.year <= end_year)
+        
     # group by genre and year
     genre_year_row = query.group_by(models.Movie.genre, models.Movie.year).all()
 
@@ -93,11 +93,14 @@ def get_genre_analysis(start_year: Optional[int] = Query(None, description="Filt
     
     # create dictionary
     genre_year_count = defaultdict(dict)
-    total_movies
+    # total movies per year
+    total_movies = defaultdict(int)
 
     for genre, year, count in genre_year_row:
         genre_year_count[genre][year] = count
-        total_movies += count
+        total_movies[year] += count
+    
+    genre_analysis.genre_popularity(genre_year_count, total_movies)
 
 
 #----------------------

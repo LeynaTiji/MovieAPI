@@ -1,4 +1,4 @@
-def genre_popularity(genre_year_count):
+def genre_popularity(genre_year_count, total_movies):
 
     popular_genres = []
 
@@ -8,5 +8,14 @@ def genre_popularity(genre_year_count):
         for y in sorted(year.keys()):
             count = year[y]
             #find percentage that genre makes up for total year
-            percentage = ((count / year[y]) * 100, 2) if year[y] else 0
+            percentage = ((count / total_movies[y]) * 100, 2) if year[y] else 0
+            # how many movies made for genre per year
             each_year.append({"year": y, "count": count, "percentage": percentage})
+
+        popular_genres.append({
+            "genre": genre,
+            "total_movies": sum(year.values()),
+            "yearly_breakdown": each_year,
+        })
+
+        print(popular_genres)
