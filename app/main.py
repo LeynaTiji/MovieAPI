@@ -84,7 +84,7 @@ def get_genre_analysis(start_year: Optional[int] = Query(None, description="Filt
         query = query.filter(models.Movie.year >= start_year)
     if end_year:
         query = query.filter(models.Movie.year <= end_year)
-        
+
     # group by genre and year
     genre_year_row = query.group_by(models.Movie.genre, models.Movie.year).all()
 
@@ -96,9 +96,18 @@ def get_genre_analysis(start_year: Optional[int] = Query(None, description="Filt
     # total movies per year
     total_movies = defaultdict(int)
 
-    for genre, year, count in genre_year_row:
-        genre_year_count[genre][year] = count
+    for all_genre, year, count in genre_year_row:
+        #split genres when there are multiple per movie
+        genres = [g.strip() for g in all_genre.split(",")]
+        # add movie to total movies once
         total_movies[year] += count
+        
+        for genre in genres:
+            # add count to each individual genre
+            if year in genre_year_count[genre]:
+                genre_year_count[genre][year] += count
+            else:
+                genre_year_count[genre][year] = count
     
     genre_analysis.genre_popularity(genre_year_count, total_movies)
 

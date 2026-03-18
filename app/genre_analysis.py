@@ -7,6 +7,7 @@ def genre_popularity(genre_year_count, total_movies):
         # sort years in order
         for y in sorted(year.keys()):
             count = year[y]
+
             #find percentage that genre makes up for total year
             percentage = ((count / total_movies[y]) * 100, 2) if year[y] else 0
             # how many movies made for genre per year
@@ -18,4 +19,6 @@ def genre_popularity(genre_year_count, total_movies):
             "yearly_breakdown": each_year,
         })
 
-        print(popular_genres)
+        popular_genres.sort(key=lambda x: x["total_movies"], reverse=True)
+    
+    print(popular_genres[0])
