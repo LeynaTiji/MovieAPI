@@ -1,7 +1,10 @@
+from collections import defaultdict
+
 def genre_popularity(genre_year_count, total_movies):
 
     popular_genres = []
 
+    # loop through all genres
     for genre, year in genre_year_count.items():
         each_year = []
         # sort years in order
@@ -20,5 +23,26 @@ def genre_popularity(genre_year_count, total_movies):
         })
 
         popular_genres.sort(key=lambda x: x["total_movies"], reverse=True)
+
     
     print(popular_genres[0])
+
+def decade_summary(genre_year_count):
+    #dictionary of dictionaries
+    all_decades = defaultdict(lambda: defaultdict(int)) 
+
+    for genre, year, in genre_year_count.items():
+
+        for y, count in year.items():
+            #work out what decade year is in
+            decade = (y // 10 ) * 10
+
+            # how many movies in the genre in specific decade
+            all_decades[decade][genre] += count
+
+    summary = []
+
+    # #loop through all decades specified region
+    # for decade in sorted(all_decades.keys()):
+
+
