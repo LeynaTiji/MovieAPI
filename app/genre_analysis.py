@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+# returns number of movies per genre per year
 def genre_popularity(genre_year_count, total_movies):
 
     popular_genres = []
@@ -12,7 +13,7 @@ def genre_popularity(genre_year_count, total_movies):
             count = year[y]
 
             #find percentage that genre makes up for total year
-            percentage = ((count / total_movies[y]) * 100, 2) if year[y] else 0
+            percentage = (round((count / total_movies[y]) * 100), 2) if year[y] else 0
             # how many movies made for genre per year
             each_year.append({"year": y, "count": count, "percentage": percentage})
 
@@ -27,9 +28,11 @@ def genre_popularity(genre_year_count, total_movies):
     
     print(popular_genres[0])
 
+# number of movies per genre per decade
 def decade_summary(genre_year_count):
-    #dictionary of dictionaries
+    # dictionary of dictionaries
     all_decades = defaultdict(lambda: defaultdict(int)) 
+
 
     for genre, year, in genre_year_count.items():
 
@@ -42,7 +45,7 @@ def decade_summary(genre_year_count):
 
     summary = []
 
-    # #loop through all decades specified region
-    # for decade in sorted(all_decades.keys()):
+    #loop through all decades specified region
+    for decade in sorted(all_decades.keys()):
 
 
