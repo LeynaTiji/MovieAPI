@@ -68,7 +68,7 @@ def get_movies_id(movie_link: str, db: Session = Depends(get_db)):
     return movie
 
 # analyse genre trends and popularity over the years
-@app.get("/movies/genre/trend")
+@app.get("/movies/genre/popularity")
 def get_genre_analysis(start_year: Optional[int] = Query(None, description="Filter from this year"), end_year: Optional[int] = Query(None, description="Filter to this year"), db: Session = Depends(get_db)):
 
     # build query of number of movies by genre and year where they don't equal none
@@ -109,7 +109,58 @@ def get_genre_analysis(start_year: Optional[int] = Query(None, description="Filt
             else:
                 genre_year_count[genre][year] = count
     
-    genre_analysis.genre_popularity(genre_year_count, total_movies)
+    # returns genres in order of most movies made over the years specified
+    popular_genres = genre_analysis.genre_popularity(genre_year_count, total_movies)
+
+    return popular_genres
+
+# analyse genre trends and popularity over the decades, returning top 5 genres of each decade
+@app.get("/movies/genre/decade_popularity")
+def get_decade_analysis(start_year: Optional[int] = Query(None, description="Filter from this year"), end_year: Optional[int] = Query(None, description="Filter to this year"), db: Session = Depends(get_db)):
+
+    # build query of number of movies by genre and year where they don't equal none
+    query = db.query(models.Movie.genre, 
+                      models.Movie.year, 
+                      func.count(models.Movie.id).label("count"),
+                      ).filter(
+                        models.Movie.genre.isnot(None), 
+                        models.Movie.year.isnot(None),)
+    
+    #apply filters if passed in
+    if start_year:
+        query = query.filter(models.Movie.year >= start_year)
+    if end_year:
+        query = query.filter(models.Movie.year <= end_year)
+
+    # group by genre and year
+    genre_year_row = query.group_by(models.Movie.genre, models.Movie.year).all()
+
+    if not genre_year_row:
+        raise HTTPException(status_code=404, detail="No genre data found")
+    
+    # create dictionary
+    genre_year_count = defaultdict(dict)
+    # total movies per year
+    total_movies = defaultdict(int)
+
+    for all_genre, year, count in genre_year_row:
+        #split genres when there are multiple per movie
+        genres = [g.strip() for g in all_genre.split(",")]
+        # add movie to total movies once
+        total_movies[year] += count
+        
+        for genre in genres:
+            # add count to each individual genre
+            if year in genre_year_count[genre]:
+                genre_year_count[genre][year] += count
+            else:
+                genre_year_count[genre][year] = count
+    
+    # returns top 5 genres for each decade between years specified
+    summary = genre_analysis.decade_summary(genre_year_count)
+
+    return summary
+
 
 
 #----------------------

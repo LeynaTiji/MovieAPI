@@ -25,10 +25,9 @@ def genre_popularity(genre_year_count, total_movies):
 
         popular_genres.sort(key=lambda x: x["total_movies"], reverse=True)
 
-    
-    print(popular_genres[0])
+    return popular_genres
 
-# number of movies per genre per decade
+# returns top 5 genres per decade
 def decade_summary(genre_year_count):
     # dictionary of dictionaries
     all_decades = defaultdict(lambda: defaultdict(int)) 
@@ -47,5 +46,25 @@ def decade_summary(genre_year_count):
 
     #loop through all decades specified region
     for decade in sorted(all_decades.keys()):
+        genre_count = all_decades[decade]
+        total = sum(genre_count.values())
+        
+        # return 5 top genres for decade
+        top_genres = sorted(genre_count.items(), key=lambda x: x[1], reverse=True)[:5]
+        summary.append({
+            "decade": f"{decade}s",
+            "total_movies": total,
+            "top_genres": [
+                {
+                    "genre": g,
+                    "count": c,
+                    "percentage": round((c / total) * 100, 2),
+                }
+                for g, c in top_genres
+            ],
+        })
+
+    return summary
+
 
 
