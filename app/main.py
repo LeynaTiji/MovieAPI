@@ -1,6 +1,9 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from .database import SessionLocal, engine, Base
+from typing import Optional
+
 from . import models, schemas, hf_semantic_analysis
 
 app = FastAPI()
@@ -29,7 +32,9 @@ def root():
 #     db.refresh(db_movie)
 #     return db_movie
 
-#--- Movie Endpoints---
+#----------------------
+#   Movie Endpoints
+#----------------------
 
 # limit set to 50 to allow pagination of movies
 @app.get("/movies", response_model=list[schemas.Movie])
@@ -60,8 +65,33 @@ def get_movies_id(movie_link: str, db: Session = Depends(get_db)):
     
     return movie
 
+# analyse genre trends and popularity over the years
+app.get("/movies/genre/trend", response_model=)
+def get_genre_analysis(start_year: Optional[int] = Query(None, description="Filter from this year"), end_year: Optional[int] = Query(None, description="Filter to this year"), db: Session = Depends(get_db)):
 
-#--- Review Endpoints---
+    # build query of number of movies by genre and year where they don't equal none
+    query = db.query(models.Movie.genre, 
+                      models.Movie.year, 
+                      func.count(models.Movie.id).label("count"),
+                      ).filter(
+                        models.Movie.genre.isnot(None), 
+                        models.Movie.year.isnot(None),)
+    
+    #apply filters if passed in
+    if start_year:
+        filtered_movies = query.filter(models.Movie.year >= start_year)
+    if end_year:
+        filtered_movies = query.filter(models.Movie.year <= end_year)
+
+    # group by genre and year
+    genre_year_row = query.group_by(models.Movie.genre, models.Movie.year).all()
+
+    if not genre_year_row:
+        raise HTTPException(status_code=404, detail="No genre data found")
+
+#----------------------
+#   Review Endpoints
+#----------------------
 
 # limit reviews to 50 per page 
 @app.get("/reviews", response_model=list[schemas.Review])
@@ -70,16 +100,15 @@ def get_reviews(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
 
 # get review by rotten tomatoes movie link
 @app.get("/reviews/by-link", response_model=list[schemas.Review])
-def get_movies_id(review_link: str, skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
+def get_movies_id(movie_link: str, skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
     review = db.query(models.Review).filter(
-        models.Review.movie_link == review_link
+        models.Review.movie_link == movie_link
     ).offset(skip).limit(limit).all()
 
     if not review:
         raise HTTPException(status_code=404, detail="Reviews not found")
     
     return review
-
 
 # summary and semantic analysis of reviews for specified movie
 @app.get("/reviews/semantics/by-link", response_model=schemas.AI_Review_Analysis)
@@ -89,11 +118,14 @@ def get_review_semantics(movie_link: str, db: Session = Depends(get_db)):
     ).all()
 
     if not reviews:
-        raise HTTPException(status_code=404, detail="Reviews not found")
+        raise HTTPException(status_code=404, detail="No reviews found")
 
     movie =  db.query(models.Movie).filter(
         models.Movie.link == movie_link
     ).first()
+
+    if not movie:
+        raise HTTPException(status_code=404, detail="Movie not found")
     
     #iterate through reviews to get review text
     review_texts = [r.review for r in reviews if r.review is not None]
@@ -102,11 +134,9 @@ def get_review_semantics(movie_link: str, db: Session = Depends(get_db)):
 
     return schemas.AI_Review_Analysis(
         movie=movie,
-        label= label,
+        sentiment_label=label,
         score=score
     )
-
-    
 
     
     
