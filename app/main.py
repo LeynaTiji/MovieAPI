@@ -2,7 +2,9 @@ from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from .database import SessionLocal, engine, Base
+
 from typing import Optional
+from collections import defaultdict
 
 from . import models, schemas, hf_semantic_analysis
 
@@ -88,6 +90,15 @@ def get_genre_analysis(start_year: Optional[int] = Query(None, description="Filt
 
     if not genre_year_row:
         raise HTTPException(status_code=404, detail="No genre data found")
+    
+    # create dictionary
+    genre_year_count = defaultdict(dict)
+    total_movies
+
+    for genre, year, count in genre_year_row:
+        genre_year_count[genre][year] = count
+        total_movies += count
+
 
 #----------------------
 #   Review Endpoints
