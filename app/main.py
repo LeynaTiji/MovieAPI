@@ -219,6 +219,18 @@ def get_recommendations(mood: str = Query(..., description="Describe what you're
 def get_reviews(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
     return db.query(models.Review).offset(skip).limit(limit).all()
 
+# get review by review id
+@app.get("/reviews/by-id", response_model=list[schemas.Review])
+def get_movies_id(review_id: str = Query(..., description="Review ID"), skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
+    review = db.query(models.Review).filter(
+        models.Review.review_id == review_id
+    ).offset(skip).limit(limit).all()
+
+    if not review:
+        raise HTTPException(status_code=404, detail="Reviews not found")
+    
+    return review
+
 # get review by rotten tomatoes movie link
 @app.get("/reviews/by-link", response_model=list[schemas.Review])
 def get_movies_id(movie_link: str = Query(..., description="Rotten Tomatoes Movie Link"), skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
