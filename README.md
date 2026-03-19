@@ -8,3 +8,8 @@ chmod +x setup.sh
 
 #### To run API
 uvicorn app.main:app --reload
+
+### To run unit tests
+pytest
+### To see the name of every individual test
+pytest tests/ -v
