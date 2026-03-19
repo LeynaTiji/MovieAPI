@@ -236,10 +236,10 @@ def create_review(review: schemas.ReviewCreate,
     db.refresh(db_review)
 
 # update a review by id
-@app.put("/reviews/by-review-id}", response_model=schemas.Review)
-def update_review(review_id: int = Query(..., description="Review ID"), review: schemas.ReviewCreate, db: Session = Depends(get_db)):
-    review = db.query(models.Review).filter(models.Review.id == review_id).first()
-    if not review:
+@app.put("/reviews/by-review-id", response_model=schemas.Review)
+def update_review(review: schemas.ReviewCreate, review_id: int = Query(..., description="Review ID"), db: Session = Depends(get_db)):
+    db_review = db.query(models.Review).filter(models.Review.id == review_id).first()
+    if not db_review:
         raise HTTPException(status_code=404, detail="Review not found")
     
     # setattr to automatically update each field
@@ -247,8 +247,8 @@ def update_review(review_id: int = Query(..., description="Review ID"), review: 
         setattr(review, field, value)
     
     db.commit()
-    db.refresh(review)
-    return review
+    db.refresh(db_review)
+    return db_review
 
 # delete a review by id
 @app.delete("/reviews/by-review-id")
