@@ -46,7 +46,7 @@ def get_movies(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
 
 # get movie by id
 @app.get("/movies/by-id", response_model=list[schemas.MovieBase])
-def get_movies_id(movie_id: int, db: Session = Depends(get_db)):
+def get_movies_id(movie_id: int = Query(..., description="Movie ID"), db: Session = Depends(get_db)):
     movie = db.query(models.Movie).filter(
         models.Movie.id == movie_id
     ).all()
@@ -58,7 +58,7 @@ def get_movies_id(movie_id: int, db: Session = Depends(get_db)):
 
 # get movie by rotten tomatoes link
 @app.get("/movies/by-link", response_model=list[schemas.MovieBase])
-def get_movies_id(movie_link: str, db: Session = Depends(get_db)):
+def get_movies_id(movie_link: str = Query(..., description="Rotten Tomatoes Movie Link"), db: Session = Depends(get_db)):
     movie =  db.query(models.Movie).filter(
         models.Movie.link == movie_link
     ).all()
@@ -168,7 +168,7 @@ def get_decade_analysis(start_year: Optional[int] = Query(None, description="Fil
         decades=summary
     )
 
-# Uses Anthropic API and db query to give movie recommendations based on users mood
+# uses Anthropic API and db query to give movie recommendations based on users mood
 @app.get("/movies/recommendations", response_model=schemas.Movie_Recs)
 def get_recommendations(mood: str = Query(..., description="Describe what you're in the mood for, e.g. 'something feel-good and lighthearted'"),
                         genre: Optional[str] = Query(None, description="Preferred genre e.g. 'Comedy'"),
@@ -217,7 +217,7 @@ def get_reviews(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
 
 # get review by rotten tomatoes movie link
 @app.get("/reviews/by-link", response_model=list[schemas.Review])
-def get_movies_id(movie_link: str, skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
+def get_movies_id(movie_link: str = Query(..., description="Rotten Tomatoes Movie Link"), skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
     review = db.query(models.Review).filter(
         models.Review.movie_link == movie_link
     ).offset(skip).limit(limit).all()
@@ -229,7 +229,7 @@ def get_movies_id(movie_link: str, skip: int = 0, limit: int = 50, db: Session =
 
 # summary and semantic analysis of reviews for specified movie
 @app.get("/reviews/semantics/by-link", response_model=schemas.AI_Review_Analysis)
-def get_review_semantics(movie_link: str, db: Session = Depends(get_db)):
+def get_review_semantics(movie_link: str = Query(..., description="Rotten Tomatoes Movie Link"), db: Session = Depends(get_db)):
     reviews = db.query(models.Review).filter(
         models.Review.movie_link == movie_link
     ).all()
