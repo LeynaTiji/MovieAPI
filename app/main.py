@@ -68,7 +68,7 @@ def get_movies_id(movie_link: str, db: Session = Depends(get_db)):
     return movie
 
 # analyse genre trends and popularity over the years
-@app.get("/movies/genre/popularity")
+@app.get("/movies/genre/popularity", response_model=schemas.List_of_Genres)
 def get_genre_analysis(start_year: Optional[int] = Query(None, description="Filter from this year"), end_year: Optional[int] = Query(None, description="Filter to this year"), db: Session = Depends(get_db)):
 
     # build query of number of movies by genre and year where they don't equal none
@@ -112,10 +112,12 @@ def get_genre_analysis(start_year: Optional[int] = Query(None, description="Filt
     # returns genres in order of most movies made over the years specified
     popular_genres = genre_analysis.genre_popularity(genre_year_count, total_movies)
 
-    return popular_genres
+    return schemas.List_of_Genres(
+        genres=popular_genres
+    )
 
 # analyse genre trends and popularity over the decades, returning top 5 genres of each decade
-@app.get("/movies/genre/decade_popularity")
+@app.get("/movies/genre/decade_popularity", response_model=schemas.Decade_Summary)
 def get_decade_analysis(start_year: Optional[int] = Query(None, description="Filter from this year"), 
                         end_year: Optional[int] = Query(None, description="Filter to this year"), 
                         db: Session = Depends(get_db)):
@@ -161,7 +163,9 @@ def get_decade_analysis(start_year: Optional[int] = Query(None, description="Fil
     # returns top 5 genres for each decade between years specified
     summary = genre_analysis.decade_summary(genre_year_count)
 
-    return summary
+    return schemas.Decade_Summary(
+        decades=summary
+    )
 
 # Uses Anthropic API and db query to give movie recommendations based on users mood
 @app.get("/movies/recommendations", response_model=schemas.Movie_Recs)

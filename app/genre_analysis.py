@@ -13,7 +13,7 @@ def genre_popularity(genre_year_count, total_movies):
             count = year[y]
 
             #find percentage that genre makes up for total year
-            percentage = (round((count / total_movies[y]) * 100), 2) if year[y] else 0
+            percentage = round(((count / total_movies[y]) * 100), 2) if year[y] else 0
             # how many movies made for genre per year
             each_year.append({"year": y, "count": count, "percentage": percentage})
 

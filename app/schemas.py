@@ -24,6 +24,7 @@ class Movie(MovieCreate):
     model_config = ConfigDict(from_attributes=True)
 
 
+
 class ReviewBase(BaseModel):
     critic_name: Optional[str]
     movie_link: Optional[str]
@@ -47,12 +48,46 @@ class Movie_Review(Movie):
 
     model_config = ConfigDict(from_attributes=True)
 
+class Yearly_Summary(BaseModel):
+    year: int
+    count: int
+    percentage: float
+
+class Popular_Genre(BaseModel):
+    genre: str
+    total_movies: int
+    yearly_breakdown: list[Yearly_Summary]
+
+class List_of_Genres(BaseModel):
+    genres: list[Popular_Genre]
+
+    model_config = ConfigDict(from_attributes=True)
+
+class genre(BaseModel):
+    genre: str
+    count: int
+    percentage: float
+
+class Top_Genres_Decade(BaseModel):
+    decade: str
+    total_movies: int
+    top_genres: list[genre]
+
+class Decade_Summary(BaseModel):
+    decades: list[Top_Genres_Decade]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+
 class AI_Review_Analysis(BaseModel):
     movie: Movie
     sentiment_label: Optional[str]
     sentiment_score: Optional[float]
 
     model_config = ConfigDict(from_attributes=True)
+
+
 
 class MovieRecommendation(BaseModel):
     movie_title: str
