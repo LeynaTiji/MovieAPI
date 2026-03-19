@@ -192,7 +192,11 @@ def get_recommendations(mood: str = Query(..., description="Describe what you're
     if not initial_recs:
         raise HTTPException(status_code=404, detail="No movies found that match your filters. Please try again")
     
-    reccomendations.AI_reccomendations(initial_recs, mood, rec_number)
+    ai_recs = reccomendations.AI_reccomendations(initial_recs, mood, rec_number)
+
+    return schemas.AI_Review_Analysis(
+        reccomendations = ai_recs
+    )
 
 #----------------------
 #   Review Endpoints
@@ -240,7 +244,7 @@ def get_review_semantics(movie_link: str, db: Session = Depends(get_db)):
     return schemas.AI_Review_Analysis(
         movie=movie,
         sentiment_label=label,
-        score=score
+        sentiment_score=score
     )
 
     

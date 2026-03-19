@@ -55,8 +55,8 @@ class AI_Review_Analysis(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-class Movie_Recs(Movie):
-    reason: Optional[str]
+class Movie_Recs(BaseModel):
+    recommendation: Optional[str]
     
     model_config = ConfigDict(from_attributes=True)
 
