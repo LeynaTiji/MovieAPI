@@ -47,7 +47,6 @@ class Movie_Review(Movie):
 
     model_config = ConfigDict(from_attributes=True)
 
-
 class AI_Review_Analysis(BaseModel):
     movie: Movie
     sentiment_label: Optional[str]
@@ -62,6 +61,7 @@ class MovieRecommendation(BaseModel):
     reason: str
 
 class Movie_Recs(BaseModel):
+    mood: str
     recommendations: list[MovieRecommendation]
     
     model_config = ConfigDict(from_attributes=True)

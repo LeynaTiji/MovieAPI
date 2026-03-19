@@ -163,7 +163,8 @@ def get_decade_analysis(start_year: Optional[int] = Query(None, description="Fil
 
     return summary
 
-@app.get("/movie/recommendations", response_model=list[schemas.Movie_Recs])
+# Uses Anthropic API and db query to give movie recommendations based on users mood
+@app.get("/movies/recommendations", response_model=schemas.Movie_Recs)
 def get_recommendations(mood: str = Query(..., description="Describe what you're in the mood for, e.g. 'something feel-good and lighthearted'"),
                         genre: Optional[str] = Query(None, description="Preferred genre e.g. 'Comedy'"),
                         decade: Optional[int] = Query(None, description="Preferred decade e.g 1990's"),
@@ -184,7 +185,7 @@ def get_recommendations(mood: str = Query(..., description="Describe what you're
         movies = movies.filter(models.Movie.genre.ilike(f"%{genre}%"))
     if decade: 
         movies = movies.filter(models.Movie.year >= decade)
-        decade_end = decade + 10
+        decade_end = decade + 9
         movies = movies.filter(models.Movie.year <= decade_end)
     
     # initial reccomendations to pass to api
@@ -196,7 +197,8 @@ def get_recommendations(mood: str = Query(..., description="Describe what you're
     ai_recs = reccomendations.AI_reccomendations(initial_recs, mood, rec_number)
 
     return schemas.Movie_Recs(
-        reccomendations = ai_recs
+        mood = mood,
+        recommendations = ai_recs
     )
 
 #----------------------
