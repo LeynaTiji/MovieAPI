@@ -6,7 +6,7 @@ from .database import SessionLocal, engine, Base
 from typing import Optional
 from collections import defaultdict
 
-from . import models, schemas, hf_semantic_analysis, genre_analysis
+from . import models, schemas, hf_semantic_analysis, genre_analysis, reccomendations
 
 app = FastAPI()
 
@@ -192,9 +192,7 @@ def get_recommendations(mood: str = Query(..., description="Describe what you're
     if not initial_recs:
         raise HTTPException(status_code=404, detail="No movies found that match your filters. Please try again")
     
-            
-    
-    
+    reccomendations.AI_reccomendations(initial_recs, mood, rec_number)
 
 #----------------------
 #   Review Endpoints
