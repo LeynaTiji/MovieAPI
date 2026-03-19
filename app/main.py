@@ -232,7 +232,7 @@ def get_movies_id(review_id: str = Query(..., description="Review ID"), skip: in
     return review
 
 # get review by rotten tomatoes movie link
-@app.get("/reviews/by-link", response_model=list[schemas.Review])
+@app.get("/reviews/by-id", response_model=list[schemas.Review])
 def get_movies_id(movie_link: str = Query(..., description="Rotten Tomatoes Movie Link"), skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
     review = db.query(models.Review).filter(
         models.Review.movie_link == movie_link
@@ -242,6 +242,19 @@ def get_movies_id(movie_link: str = Query(..., description="Rotten Tomatoes Movi
         raise HTTPException(status_code=404, detail="Reviews not found")
     
     return review
+
+#create a review
+@app.post("/reviews", response_model=schemas.ReviewCreate)
+def create_review(movie_id: int = Query(..., description="Movie ID"), db: Session = Depends(get_db)):
+    # check movie exists 
+    movie = db.query(models.Movie).filter(
+        models.Movie.id == movie_id
+    ).all()
+    if not movie:
+        raise HTTPException(status_code=404, detail="Movie not found")
+    
+
+    
 
 # semantic analysis of reviews for specified movie
 @app.get("/reviews/semantics/by-link", response_model=schemas.AI_Review_Analysis)
