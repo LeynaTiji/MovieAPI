@@ -229,7 +229,7 @@ def get_movies_id(movie_link: str = Query(..., description="Rotten Tomatoes Movi
     
     return review
 
-# summary and semantic analysis of reviews for specified movie
+# semantic analysis of reviews for specified movie
 @app.get("/reviews/semantics/by-link", response_model=schemas.AI_Review_Analysis)
 def get_review_semantics(movie_link: str = Query(..., description="Rotten Tomatoes Movie Link"), db: Session = Depends(get_db)):
     reviews = db.query(models.Review).filter(
