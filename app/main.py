@@ -116,7 +116,9 @@ def get_genre_analysis(start_year: Optional[int] = Query(None, description="Filt
 
 # analyse genre trends and popularity over the decades, returning top 5 genres of each decade
 @app.get("/movies/genre/decade_popularity")
-def get_decade_analysis(start_year: Optional[int] = Query(None, description="Filter from this year"), end_year: Optional[int] = Query(None, description="Filter to this year"), db: Session = Depends(get_db)):
+def get_decade_analysis(start_year: Optional[int] = Query(None, description="Filter from this year"), 
+                        end_year: Optional[int] = Query(None, description="Filter to this year"), 
+                        db: Session = Depends(get_db)):
 
     # build query of number of movies by genre and year where they don't equal none
     query = db.query(models.Movie.genre, 
@@ -161,7 +163,34 @@ def get_decade_analysis(start_year: Optional[int] = Query(None, description="Fil
 
     return summary
 
+@app.get("/movie/recommendations")
+def get_recommendations(mood: str = Query(..., description="Describe what you're in the mood for, e.g. 'something feel-good and lighthearted'"),
+                        genre: Optional[str] = Query(None, description="Preferred genre e.g. 'Comedy'"),
+                        year: Optional[str] = Query(None, description="Preferred decade e.g 1990's"),
+                        number: int = Query(5, ge=1, le=20, description="Number of choices to pull from db"),
+                        db: Session = Depends(get_db)):
+    
+    # convert year into decade incase inputted incorrectly
+    decade = (year // 10 ) * 10
 
+    # initial query of db to movies
+    movies = db.query(models.Movie).filter(
+        models.Movie.genre.isnot(None),
+        models.Movie.year.isnot(None),
+    )
+
+    if genre:
+        movies = movies.filter(models.Movie.genre.ilike(f"%{genre}%"))
+    if decade: 
+        movies = movies.filter(models.Movie.year >= decade)
+        decade_end += 10
+        movies = movies.filter(models.Movie.year <= decade_end)
+    
+    # initial reccomendations to pass to api
+    
+            
+    
+    
 
 #----------------------
 #   Review Endpoints
