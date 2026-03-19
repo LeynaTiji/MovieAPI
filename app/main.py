@@ -167,7 +167,7 @@ def get_decade_analysis(start_year: Optional[int] = Query(None, description="Fil
 def get_recommendations(mood: str = Query(..., description="Describe what you're in the mood for, e.g. 'something feel-good and lighthearted'"),
                         genre: Optional[str] = Query(None, description="Preferred genre e.g. 'Comedy'"),
                         year: Optional[str] = Query(None, description="Preferred decade e.g 1990's"),
-                        number: int = Query(5, ge=1, le=20, description="Number of choices to pull from db"),
+                        rec_number: int = Query(5, ge=1, le=20, description="Number of choices to pull from db"),
                         db: Session = Depends(get_db)):
     
     # convert year into decade incase inputted incorrectly
@@ -187,6 +187,10 @@ def get_recommendations(mood: str = Query(..., description="Describe what you're
         movies = movies.filter(models.Movie.year <= decade_end)
     
     # initial reccomendations to pass to api
+    initial_recs = movies.order_by(func.random()).limit(rec_number * 3).all()
+
+    if not initial_recs:
+        raise HTTPException(status_code=404, detail="No movies found that match your filters. Please try again")
     
             
     
