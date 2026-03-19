@@ -1,0 +1,92 @@
+from app.main import app
+from fastapi.testclient import TestClient
+
+client = TestClient(app)
+
+# test genre popularity function
+
+def test_genre_popularity_200(client):
+    response = client.get("/movies/genre/popularity")
+    assert response.status_code == 200
+
+def test_genre_popularity_genres_list(client):
+    response = client.get("/movies/genre/popularity")
+    assert "genres" in response.json()
+    assert isinstance(response.json()["genres"], list)
+
+def test_genre_popularity_contains_drama(client):
+    response = client.get("/movies/genre/popularity")
+    genres = [g["genre"] for g in response.json()["genres"]]
+    assert "Drama" in genres
+
+def test_genre_popularity_yearly_breakdown_exists(client):
+    response = client.get("/movies/genre/popularity")
+    first_genre = response.json()["genres"][0]
+    assert "yearly_breakdown" in first_genre
+    assert isinstance(first_genre["yearly_breakdown"], list)
+
+def test_genre_popularity_with_start_year(client):
+    response = client.get("/movies/genre/popularity?start_year=2000")
+    assert response.status_code == 200
+    # check only movie1 (2010) should be returned, not movie2 (1995)
+    genres = [g["genre"] for g in response.json()["genres"]]
+    assert "Drama" in genres
+
+def test_genre_popularity_with_end_year(client):
+    response = client.get("/movies/genre/popularity?end_year=2000")
+    assert response.status_code == 200
+    # only movie2 (1995) should be returned
+    genres = [g["genre"] for g in response.json()["genres"]]
+    assert "Mystery & Suspense" in genres
+
+def test_genre_popularity_with_year_range(client):
+    response = client.get("/movies/genre/popularity?start_year=2005&end_year=2015")
+    assert response.status_code == 200
+    genres = [g["genre"] for g in response.json()["genres"]]
+    assert "Drama" in genres
+
+def test_genre_popularity_total_movies_is_int(client):
+    response = client.get("/movies/genre/popularity")
+    first_genre = response.json()["genres"][0]
+    assert isinstance(first_genre["total_movies"], int)
+
+def test_genre_popularity_no_data_returns_404(client):
+    # year range with no movies
+    response = client.get("/movies/genre/popularity?start_year=1800&end_year=1850")
+    assert response.status_code == 404
+    assert response.json()["detail"] == "No genre data found"
+
+# test decades function
+
+def test_decade_popularity_200(client):
+    response = client.get("/movies/genre/decade_popularity")
+    assert response.status_code == 200
+
+def test_decade_popularity_returns_decades_list(client):
+    response = client.get("/movies/genre/decade_popularity")
+    assert "decades" in response.json()
+    assert isinstance(response.json()["decades"], list)
+
+def test_decade_popularity_returns_two_decades_list(client):
+    response = client.get("/movies/genre/decade_popularity")
+    decades = [d["decade"] for d in response.json()["decades"]]
+    assert "2010s" in decades
+    assert "1990s" in decades
+
+def test_decade_popularity_top_genres_exists(client):
+    response = client.get("/movies/genre/decade_popularity")
+    first_decade = response.json()["decades"][0]
+    assert "top_genres" in first_decade
+    assert isinstance(first_decade["top_genres"], list)
+
+def test_decade_popularity_with_year_filter(client):
+    response = client.get("/movies/genre/decade_popularity?start_year=2000")
+    assert response.status_code == 200
+    decades = [d["decade"] for d in response.json()["decades"]]
+    assert "2010s" in decades
+    assert "1990s" not in decades
+
+def test_decade_popularity_no_data_returns_404(client):
+    response = client.get("/movies/genre/decade_popularity?start_year=1800&end_year=1850")
+    assert response.status_code == 404
+    assert response.json()["detail"] == "No genre data found"
