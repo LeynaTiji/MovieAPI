@@ -163,7 +163,7 @@ def get_decade_analysis(start_year: Optional[int] = Query(None, description="Fil
 
     return summary
 
-@app.get("/movie/recommendations")
+@app.get("/movie/recommendations", response_model=list[schemas.Movie_Recs])
 def get_recommendations(mood: str = Query(..., description="Describe what you're in the mood for, e.g. 'something feel-good and lighthearted'"),
                         genre: Optional[str] = Query(None, description="Preferred genre e.g. 'Comedy'"),
                         year: Optional[str] = Query(None, description="Preferred decade e.g 1990's"),

@@ -51,7 +51,12 @@ class Movie_Review(Movie):
 class AI_Review_Analysis(BaseModel):
     movie: Movie
     sentiment_label: Optional[str]
-    score: Optional[float]
+    sentiment_score: Optional[float]
 
+    model_config = ConfigDict(from_attributes=True)
+
+class Movie_Recs(Movie):
+    reason: Optional[str]
+    
     model_config = ConfigDict(from_attributes=True)
 
