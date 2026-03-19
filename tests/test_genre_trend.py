@@ -16,3 +16,9 @@ def test_genre_popularity_contains_drama(client):
     response = client.get("/movies/genre/popularity")
     genres = [g["genre"] for g in response.json()["genres"]]
     assert "Drama" in genres
+
+def test_genre_popularity_yearly_breakdown_exists(client):
+    response = client.get("/movies/genre/popularity")
+    first_genre = response.json()["genres"][0]
+    assert "yearly_breakdown" in first_genre
+    assert isinstance(first_genre["yearly_breakdown"], list)
