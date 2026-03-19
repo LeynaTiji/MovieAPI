@@ -265,7 +265,7 @@ def delete_review(review_id: int = Query(..., description="Review ID"), db: Sess
 @app.get("/reviews/by-id", response_model=list[schemas.Review])
 def get_movies_id(review_id: str = Query(..., description="Review ID"), skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
     review = db.query(models.Review).filter(
-        models.Review.review_id == review_id
+        models.Review.id == review_id
     ).offset(skip).limit(limit).all()
 
     if not review:
