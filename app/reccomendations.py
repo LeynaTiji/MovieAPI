@@ -17,7 +17,7 @@ def AI_reccomendations(movies, mood, number):
     The mood the user has specified is - {mood}. Here are some movies from the database: {movie_list}.
     From this list, please recommend {number} suited to the users specified mood.
     For each movie recomendation, give an explanation, in 2-3 sentences, why it matches the mood specified.
-    Respond in the exact JSON format provided.
+    Respond in the exact JSON format provided with no extra text, no markdown, no code blocks, just raw JSON:
     {{
         "recommendations": [
             {{
@@ -29,11 +29,7 @@ def AI_reccomendations(movies, mood, number):
         ]
     }}
     """
-    print("Sending to Claude...")
-    print("Movie list:", movie_list)
-    print("Mood:", mood)
-
-
+    
     # code created with reference to https://platform.claude.com/docs/en/build-with-claude/structured-outputs
     try:
         message = client.messages.create(
@@ -41,14 +37,15 @@ def AI_reccomendations(movies, mood, number):
             max_tokens=1024,
             messages=[{"role": "user", "content": prompt}],
         )
-            print("Hello Claude")
-        print("Raw message:", message)
-        print("Content:", message.content)
-        print("Text:", message.content[0].text)
-        ai_response = json.loads(message.content[0].text)
-        print("Parsed:", ai_response)
+        raw_text = message.content[0].text
 
+        # strip markdown code blocks that may be added to prevent any errors in formatting
+        if raw_text.startswith("```"):
+            raw_text = raw_text.split("```")[1]
+            if raw_text.startswith("json"):
+                raw_text = raw_text[4:]
 
+        ai_response = json.loads(raw_text.strip())
     except json.JSONDecodeError:
         raise HTTPException(
             status_code=500,

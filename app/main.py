@@ -195,7 +195,7 @@ def get_recommendations(mood: str = Query(..., description="Describe what you're
     
     ai_recs = reccomendations.AI_reccomendations(initial_recs, mood, rec_number)
 
-    return schemas.AI_Review_Analysis(
+    return schemas.Movie_Recs(
         reccomendations = ai_recs
     )
 
