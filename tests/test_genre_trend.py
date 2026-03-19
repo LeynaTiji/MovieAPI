@@ -53,3 +53,18 @@ def test_genre_popularity_no_data_returns_404(client):
     response = client.get("/movies/genre/popularity?start_year=1800&end_year=1850")
     assert response.status_code == 404
     assert response.json()["detail"] == "No genre data found"
+
+def test_decade_popularity_200(client):
+    response = client.get("/movies/genre/decade_popularity")
+    assert response.status_code == 200
+
+def test_decade_popularity_returns_decades_list(client):
+    response = client.get("/movies/genre/decade_popularity")
+    assert "decades" in response.json()
+    assert isinstance(response.json()["decades"], list)
+
+def test_decade_popularity_returns_two_decades_list(client):
+    response = client.get("/movies/genre/decade_popularity")
+    decades = [d["decade"] for d in response.json()["decades"]]
+    assert "2010s" in decades
+    assert "1990s" in decades
