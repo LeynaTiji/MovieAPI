@@ -24,8 +24,17 @@ def test_returns_score(client):
             response = client.get("/reviews/semantics/by-link?movie_link=m/test_movie")
         assert response.json()["sentiment_score"] == 0.95
 
+def test_returns_negative_sentiment(client):
+        with patch("app.analysis.hf_semantic_analysis.review_semantics", return_value=("NEGATIVE", 0.04)):
+            response = client.get("/reviews/semantics/by-link?movie_link=m/test_movie")
+        assert response.json()["sentiment_label"] == "NEGATIVE"
+        assert response.json()["sentiment_score"] == 0.04
+
 def test_no_reviews_returns_404( client):
         response = client.get("/reviews/semantics/by-link?movie_link=/m/no_reviews")
         assert response.status_code == 404
         assert response.json()["detail"] == "No reviews found"
 
+def test_missing_param_sentiment(client):
+        response = client.get("/reviews/semantics/by-link")
+        assert response.status_code == 422
