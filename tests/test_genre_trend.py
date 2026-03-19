@@ -3,6 +3,8 @@ from fastapi.testclient import TestClient
 
 client = TestClient(app)
 
+# test genre popularity function
+
 def test_genre_popularity_200(client):
     response = client.get("/movies/genre/popularity")
     assert response.status_code == 200
@@ -54,6 +56,8 @@ def test_genre_popularity_no_data_returns_404(client):
     assert response.status_code == 404
     assert response.json()["detail"] == "No genre data found"
 
+# test decades function
+
 def test_decade_popularity_200(client):
     response = client.get("/movies/genre/decade_popularity")
     assert response.status_code == 200
@@ -68,3 +72,21 @@ def test_decade_popularity_returns_two_decades_list(client):
     decades = [d["decade"] for d in response.json()["decades"]]
     assert "2010s" in decades
     assert "1990s" in decades
+
+def test_decade_popularity_top_genres_exists(client):
+    response = client.get("/movies/genre/decade_popularity")
+    first_decade = response.json()["decades"][0]
+    assert "top_genres" in first_decade
+    assert isinstance(first_decade["top_genres"], list)
+
+def test_decade_popularity_with_year_filter(client):
+    response = client.get("/movies/genre/decade_popularity?start_year=2000")
+    assert response.status_code == 200
+    decades = [d["decade"] for d in response.json()["decades"]]
+    assert "2010s" in decades
+    assert "1990s" not in decades
+
+def test_decade_popularity_no_data_returns_404(client):
+    response = client.get("/movies/genre/decade_popularity?start_year=1800&end_year=1850")
+    assert response.status_code == 404
+    assert response.json()["detail"] == "No genre data found"
