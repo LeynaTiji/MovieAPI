@@ -35,9 +35,11 @@ def root():
 #     db.refresh(db_movie)
 #     return db_movie
 
-#----------------------
-#   Movie Endpoints
-#----------------------
+
+#--------------------------------------------
+#              Movie Endpoints
+#--------------------------------------------
+
 
 # limit set to 50 to allow pagination of movies
 @app.get("/movies", response_model=list[schemas.Movie])
@@ -206,9 +208,9 @@ def get_recommendations(mood: str = Query(..., description="Describe what you're
         recommendations = ai_recs
     )
 
-#----------------------
-#   Review Endpoints
-#----------------------
+#--------------------------------------------
+#              Review Endpoints
+#--------------------------------------------
 
 # limit reviews to 50 per page 
 @app.get("/reviews", response_model=list[schemas.Review])
