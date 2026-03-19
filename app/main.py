@@ -72,7 +72,9 @@ def get_movies_id(movie_link: str = Query(..., description="Rotten Tomatoes Movi
 
 # analyse genre trends and popularity over the years
 @app.get("/movies/genre/popularity", response_model=schemas.List_of_Genres)
-def get_genre_analysis(start_year: Optional[int] = Query(None, description="Filter from this year"), end_year: Optional[int] = Query(None, description="Filter to this year"), db: Session = Depends(get_db)):
+def get_genre_analysis(start_year: Optional[int] = Query(None, description="Filter from this year"), 
+                       end_year: Optional[int] = Query(None, description="Filter to this year"), 
+                       db: Session = Depends(get_db)):
 
     # build query of number of movies by genre and year where they don't equal none
     query = db.query(models.Movie.genre, 
