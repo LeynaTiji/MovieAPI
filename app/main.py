@@ -6,7 +6,8 @@ from .database import SessionLocal, engine, Base
 from typing import Optional
 from collections import defaultdict
 
-from . import models, schemas, hf_semantic_analysis, genre_analysis, reccomendations
+from . import models, schemas
+from .analysis import hf_semantic_analysis, genre_analysis, reccomendations
 
 app = FastAPI()
 
