@@ -12,7 +12,6 @@ def AI_reccomendations(movies, mood, number):
     movie_list = "-".join([f"- {m.title} ({m.year}) | Genre: {m.genre} |" for m in movies])
 
     # Claude API prompt
-
     prompt = f"""You are a movie recommendation assistant. A user has is looking for a movie to watch based on their mood. 
     The mood the user has specified is - {mood}. Here are some movies from the database: {movie_list}.
     From this list, please recommend {number} suited to the users specified mood.
@@ -29,8 +28,9 @@ def AI_reccomendations(movies, mood, number):
         ]
     }}
     """
-    
+
     # code created with reference to https://platform.claude.com/docs/en/build-with-claude/structured-outputs
+    #create response using claude and catch any response errors
     try:
         message = client.messages.create(
             model="claude-haiku-4-5",

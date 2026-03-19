@@ -55,8 +55,13 @@ class AI_Review_Analysis(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+class MovieRecommendation(BaseModel):
+    movie_title: str
+    year: int
+    genre: str
+    reason: str
+
 class Movie_Recs(BaseModel):
-    recommendation: Optional[str]
+    recommendations: list[MovieRecommendation]
     
     model_config = ConfigDict(from_attributes=True)
-
