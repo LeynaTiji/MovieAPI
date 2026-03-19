@@ -166,12 +166,13 @@ def get_decade_analysis(start_year: Optional[int] = Query(None, description="Fil
 @app.get("/movie/recommendations", response_model=list[schemas.Movie_Recs])
 def get_recommendations(mood: str = Query(..., description="Describe what you're in the mood for, e.g. 'something feel-good and lighthearted'"),
                         genre: Optional[str] = Query(None, description="Preferred genre e.g. 'Comedy'"),
-                        year: Optional[str] = Query(None, description="Preferred decade e.g 1990's"),
+                        decade: Optional[int] = Query(None, description="Preferred decade e.g 1990's"),
                         rec_number: int = Query(5, ge=1, le=20, description="Number of choices to pull from db"),
                         db: Session = Depends(get_db)):
     
     # convert year into decade incase inputted incorrectly
-    decade = (year // 10 ) * 10
+    if decade:
+        decade = (decade // 10 ) * 10
 
     # initial query of db to movies
     movies = db.query(models.Movie).filter(
@@ -183,7 +184,7 @@ def get_recommendations(mood: str = Query(..., description="Describe what you're
         movies = movies.filter(models.Movie.genre.ilike(f"%{genre}%"))
     if decade: 
         movies = movies.filter(models.Movie.year >= decade)
-        decade_end += 10
+        decade_end = decade + 10
         movies = movies.filter(models.Movie.year <= decade_end)
     
     # initial reccomendations to pass to api

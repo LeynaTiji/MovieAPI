@@ -1,15 +1,15 @@
 import os
-import anthropic
 import json
 from fastapi import HTTPException
-
-
+from dotenv import load_dotenv
+load_dotenv()
+import anthropic
 
 client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 def AI_reccomendations(movies, mood, number):
 
-    movie_list = "-".join([f"- {m.movie_title} ({m.year}) | Genre: {m.genre} |" for m in movies])
+    movie_list = "-".join([f"- {m.title} ({m.year}) | Genre: {m.genre} |" for m in movies])
 
     # Claude API prompt
 
@@ -21,13 +21,19 @@ def AI_reccomendations(movies, mood, number):
     {{
         "recommendations": [
             {{
-            "movie_title": { "type": "string" },
-            "year": {"type": "integer"},
-            "genre": { "type": "string" },
+            "movie_title": "Percy Jackson & the Olympians: The Lightning Theif",
+            "year": 2010,
+            "genre": "Family, Fantasy",
             "reason": "Why this matches the mood"
-            }} 
+            }}
+        ]
     }}
     """
+    print("Sending to Claude...")
+    print("Movie list:", movie_list)
+    print("Mood:", mood)
+
+
     # code created with reference to https://platform.claude.com/docs/en/build-with-claude/structured-outputs
     try:
         message = client.messages.create(
@@ -35,8 +41,14 @@ def AI_reccomendations(movies, mood, number):
             max_tokens=1024,
             messages=[{"role": "user", "content": prompt}],
         )
+            print("Hello Claude")
+        print("Raw message:", message)
+        print("Content:", message.content)
+        print("Text:", message.content[0].text)
         ai_response = json.loads(message.content[0].text)
- 
+        print("Parsed:", ai_response)
+
+
     except json.JSONDecodeError:
         raise HTTPException(
             status_code=500,
