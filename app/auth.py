@@ -35,9 +35,16 @@ def create_token(data: dict):
 
 # check user token if trying to access protected endpoints
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    check_credentials = HTTPException(
+    checked_credentials = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"}, 
     )
     
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise checked_credentials
+    except JWTError:
+        raise checked_credentials
