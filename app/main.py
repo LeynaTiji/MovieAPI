@@ -242,7 +242,9 @@ def get_reviews(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
 #create a review by id
 @app.post("/reviews", response_model=schemas.Review)
 def create_review(review: schemas.ReviewCreate,
-                  db: Session = Depends(get_db)):
+                  db: Session = Depends(get_db),
+                  current_user: models.User = Depends(auth.get_current_user)):
+
     # check movie exists 
     movie = db.query(models.Movie).filter(
         models.Movie.id == review.movie_id
@@ -258,7 +260,11 @@ def create_review(review: schemas.ReviewCreate,
 
 # update a review by id
 @app.put("/reviews/by-review-id", response_model=schemas.Review)
-def update_review(review: schemas.ReviewCreate, review_id: int = Query(..., description="Review ID"), db: Session = Depends(get_db)):
+def update_review(review: schemas.ReviewCreate, 
+                  review_id: int = Query(..., description="Review ID"), 
+                  db: Session = Depends(get_db),
+                  current_user: models.User = Depends(auth.get_current_user)):
+    
     db_review = db.query(models.Review).filter(models.Review.id == review_id).first()
     if not db_review:
         raise HTTPException(status_code=404, detail="Review not found")
@@ -273,7 +279,10 @@ def update_review(review: schemas.ReviewCreate, review_id: int = Query(..., desc
 
 # delete a review by id
 @app.delete("/reviews/by-review-id")
-def delete_review(review_id: int = Query(..., description="Review ID"), db: Session = Depends(get_db)):
+def delete_review(review_id: int = Query(..., description="Review ID"), 
+                  db: Session = Depends(get_db),
+                  current_user: models.User = Depends(auth.get_current_user)):
+    
     review = db.query(models.Review).filter(models.Review.id == review_id).first()
     if not review:
         raise HTTPException(status_code=404, detail="Review not found")
