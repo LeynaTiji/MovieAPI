@@ -1,5 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi_mcp import FastApiMCP
+
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from .database import SessionLocal, engine, Base, get_db
@@ -10,7 +12,10 @@ from collections import defaultdict
 from . import models, schemas, auth
 from .analysis import hf_semantic_analysis, genre_analysis, reccomendations
 
+# code implemented with help from https://fastapi-mcp.tadata.com/getting-started/welcome
 app = FastAPI()
+mcp = FastApiMCP(app)
+mcp.mount()
 
 Base.metadata.create_all(bind=engine)
 
@@ -57,12 +62,18 @@ def root():
 
 
 # limit set to 50 to allow pagination of movies
-@app.get("/movies", response_model=list[schemas.Movie])
+@app.get("/movies",
+        summary="Gets all movies in database",
+        description="Gets all movies in database, limited by pagnation values",
+        response_model=list[schemas.Movie])
 def get_movies(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
     return db.query(models.Movie).offset(skip).limit(limit).all()
 
 # get movie by id
-@app.get("/movies/by-id", response_model=list[schemas.MovieBase])
+@app.get("/movies/by-id",
+        summary="Returns movie by id",
+        description="Uses id to query database and return that movie",
+        response_model=list[schemas.MovieBase])
 def get_movies_id(movie_id: int = Query(..., description="Movie ID"), db: Session = Depends(get_db)):
     movie = db.query(models.Movie).filter(
         models.Movie.id == movie_id
@@ -74,7 +85,10 @@ def get_movies_id(movie_id: int = Query(..., description="Movie ID"), db: Sessio
     return movie
 
 # get movie by rotten tomatoes link
-@app.get("/movies/by-link", response_model=list[schemas.MovieBase])
+@app.get("/movies/by-link", 
+         summary="Returns movie using rotten tomatoes link",
+        description="Uses rotten tomatoes to query database and return that movie",
+        response_model=list[schemas.MovieBase])
 def get_movies_id(movie_link: str = Query(..., description="Rotten Tomatoes Movie Link"), db: Session = Depends(get_db)):
     movie =  db.query(models.Movie).filter(
         models.Movie.link == movie_link
@@ -86,7 +100,10 @@ def get_movies_id(movie_link: str = Query(..., description="Rotten Tomatoes Movi
     return movie
 
 # analyse genre trends and popularity over the years
-@app.get("/movies/genre/popularity", response_model=schemas.ListofGenres)
+@app.get("/movies/genre/popularity",
+        summary="Gets each movie genre and total number of films made per year",
+        description="Retrieves genre popularity over years specified by getting total number of films made of genre in those years",
+        response_model=schemas.ListofGenres)
 def get_genre_analysis(start_year: Optional[int] = Query(None, description="Filter from this year"), 
                        end_year: Optional[int] = Query(None, description="Filter to this year"), 
                        db: Session = Depends(get_db)):
@@ -137,7 +154,10 @@ def get_genre_analysis(start_year: Optional[int] = Query(None, description="Filt
     )
 
 # analyse genre trends and popularity over the decades, returning top 5 genres of each decade
-@app.get("/movies/genre/decade_popularity", response_model=schemas.DecadeSummary)
+@app.get("/movies/genre/decade_popularity",
+        summary="Get top 5 genres per decade",
+        description="Converts years into decades and retrieves the top 5 genres per decade with total number of films made per genre",
+        response_model=schemas.DecadeSummary)
 def get_decade_analysis(start_year: Optional[int] = Query(None, description="Filter from this year"), 
                         end_year: Optional[int] = Query(None, description="Filter to this year"), 
                         db: Session = Depends(get_db)):
@@ -188,7 +208,10 @@ def get_decade_analysis(start_year: Optional[int] = Query(None, description="Fil
     )
 
 # uses Anthropic API and db query to give movie recommendations based on users mood
-@app.get("/movies/recommendations", response_model=schemas.MovieRecs)
+@app.get("/movies/recommendations", 
+        summary="Gets AI movie recommendations",
+        description="Recommends movies based on mood, genre and decade using AI",
+        response_model=schemas.MovieRecs)
 def get_recommendations(mood: str = Query(..., description="Describe what you're in the mood for, e.g. 'something feel-good and lighthearted'"),
                         genre: Optional[str] = Query(None, description="Preferred genre e.g. 'Comedy'"),
                         decade: Optional[int] = Query(None, description="Preferred decade e.g 1990's"),
@@ -230,12 +253,18 @@ def get_recommendations(mood: str = Query(..., description="Describe what you're
 #--------------------------------------------
 
 # limit reviews to 50 per page 
-@app.get("/reviews", response_model=list[schemas.Review])
+@app.get("/reviews",
+        summary="Gets all revies in database",
+        description="Gets all reviews in database, limited by pagnation values",
+        response_model=list[schemas.Review])
 def get_reviews(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
     return db.query(models.Review).offset(skip).limit(limit).all()
 
 #create a review by id
-@app.post("/reviews", response_model=schemas.Review)
+@app.post("/reviews",
+        summary="Post review by id",
+        description="Posts a review in database if film exists",
+        response_model=schemas.Review)
 def create_review(review: schemas.ReviewCreate,
                   db: Session = Depends(get_db),
                   current_user: models.User = Depends(auth.get_current_user)):
@@ -254,7 +283,10 @@ def create_review(review: schemas.ReviewCreate,
     return db_review
 
 # update a review by id
-@app.put("/reviews/by-review-id", response_model=schemas.Review)
+@app.put("/reviews/by-review-id",
+        summary="Update review",
+        description="Edit review by specifying review id",
+        response_model=schemas.Review)
 def update_review(review: schemas.ReviewCreate, 
                   review_id: int = Query(..., description="Review ID"), 
                   db: Session = Depends(get_db),
@@ -273,7 +305,9 @@ def update_review(review: schemas.ReviewCreate,
     return db_review
 
 # delete a review by id
-@app.delete("/reviews/by-review-id")
+@app.delete("/reviews/by-review-id",
+            summary="Delete review",
+            description="Delete review by providing review id",)
 def delete_review(review_id: int = Query(..., description="Review ID"), 
                   db: Session = Depends(get_db),
                   current_user: models.User = Depends(auth.get_current_user)):
@@ -287,7 +321,10 @@ def delete_review(review_id: int = Query(..., description="Review ID"),
     return {"message": f"Review {review_id} deleted successfully"}
 
 # get review by review id
-@app.get("/reviews/by-id", response_model=list[schemas.Review])
+@app.get("/reviews/by-id", 
+        summary="Gets review in database",
+        description="Gets review in database by providing review id",
+        response_model=list[schemas.Review])
 def get_movies_id(review_id: str = Query(..., description="Review ID"), skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
     review = db.query(models.Review).filter(
         models.Review.id == review_id
@@ -299,7 +336,10 @@ def get_movies_id(review_id: str = Query(..., description="Review ID"), skip: in
     return review
 
 # get review by rotten tomatoes movie link
-@app.get("/reviews/by-link", response_model=list[schemas.Review])
+@app.get("/reviews/by-link",
+        summary="Gets review in database",
+        description="Gets review in database by providing rotten tomatoes link",
+        response_model=list[schemas.Review])
 def get_movies_id(movie_link: str = Query(..., description="Rotten Tomatoes Movie Link"), skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
     review = db.query(models.Review).filter(
         models.Review.movie_link == movie_link
@@ -311,7 +351,10 @@ def get_movies_id(movie_link: str = Query(..., description="Rotten Tomatoes Movi
     return review
 
 # semantic analysis of reviews for specified movie
-@app.get("/reviews/semantics/by-link", response_model=schemas.AIReviewAnalysis)
+@app.get("/reviews/semantics/by-link", 
+        summary="Gets overall semantics of reviews for a fil",
+        description="Gets overall semantic label and score of a film using NLP and movie link",
+        response_model=schemas.AIReviewAnalysis)
 def get_review_semantics(movie_link: str = Query(..., description="Rotten Tomatoes Movie Link"), db: Session = Depends(get_db)):
     reviews = db.query(models.Review).filter(
         models.Review.movie_link == movie_link
