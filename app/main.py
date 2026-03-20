@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from .database import SessionLocal, engine, Base
@@ -21,8 +22,8 @@ def get_db():
     finally:
         db.close()
 
-
-@app.post("/register")
+# user registers sucessfully and recieves a unique token
+@app.post("/register", response_model=schemas.Token)
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     already_user = db.query(models.User).filter(models.User.username == user.username).first()
 
@@ -38,7 +39,18 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
     token = auth.create_token({"sub": user.username})
     return {"access_token": token, "token_type": "bearer" }
-          
+
+# user logs in 
+@app.post("/login", response_model=schemas.Token)
+def login(input: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.username == input.username).first()
+    verified = auth.verify_password(input.password, user.hashed_password)
+    if not user or not verified:
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
+    
+    token = auth.create_token({"sub": user.username})
+    return {"access_token": token, "token_type": "bearer"}
+
 #default endpoint
 @app.get("/")
 def root():
