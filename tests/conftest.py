@@ -86,8 +86,16 @@ def setup_database():
         score="7/10",
         critic_name="Jane Reviewer"
     )
+    review3 = models.Review(
+        id=3,
+        movie_link="m/test_movie_2",
+        review="So boring omggggggggg.",
+        score="1/10",
+        critic_name="HollyHatesFilms"
+    )
     db.add(movie2)
     db.add(review2)
+    db.add(review3)
     
     db.commit()
     db.close()
@@ -98,5 +106,6 @@ def setup_database():
 # configure client to test db
 @pytest.fixture
 def client(setup_database):
+
     with TestClient(app) as client:
         yield client

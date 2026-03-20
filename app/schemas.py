@@ -2,16 +2,16 @@ from pydantic import BaseModel, ConfigDict
 from typing import Optional, List
 
 class MovieBase(BaseModel):
-    title: Optional[str]
-    info: Optional[str]
-    rating: Optional[str]
-    age: Optional[str]
-    genre: Optional[str]
-    director: Optional[str]
-    authors: Optional[str]
-    actors: Optional[str]
-    year: Optional[int]
-    link: Optional[str]
+    title: Optional[str] = None
+    info: Optional[str] = None
+    rating: Optional[str] = None
+    age: Optional[str] = None
+    genre: Optional[str] = None
+    director: Optional[str] = None
+    authors: Optional[str] = None
+    actors: Optional[str] = None
+    year: Optional[int] = None
+    link: Optional[str] = None 
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -26,10 +26,10 @@ class Movie(MovieCreate):
 
 
 class ReviewBase(BaseModel):
-    critic_name: Optional[str]
-    movie_link: Optional[str]
-    score: Optional[str]
-    review: Optional[str]
+    critic_name: Optional[str] = None
+    movie_link: Optional[str] = None
+    score: Optional[str] = None
+    review: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -38,7 +38,7 @@ class ReviewCreate(ReviewBase):
 
 class Review(ReviewBase):
     id: int
-
+    
     model_config = ConfigDict(from_attributes=True)
 
 class Movie_Review(Movie):
@@ -48,39 +48,39 @@ class Movie_Review(Movie):
 
     model_config = ConfigDict(from_attributes=True)
 
-class Yearly_Summary(BaseModel):
+class YearlySummary(BaseModel):
     year: int
     count: int
     percentage: float
 
-class Popular_Genre(BaseModel):
+class PopularGenre(BaseModel):
     genre: str
     total_movies: int
-    yearly_breakdown: list[Yearly_Summary]
+    yearly_breakdown: list[YearlySummary]
 
-class List_of_Genres(BaseModel):
-    genres: list[Popular_Genre]
+class ListofGenres(BaseModel):
+    genres: list[PopularGenre]
 
     model_config = ConfigDict(from_attributes=True)
 
-class genre(BaseModel):
+class Genre(BaseModel):
     genre: str
     count: int
     percentage: float
 
-class Top_Genres_Decade(BaseModel):
+class TopGenresDecade(BaseModel):
     decade: str
     total_movies: int
-    top_genres: list[genre]
+    top_genres: list[Genre]
 
-class Decade_Summary(BaseModel):
-    decades: list[Top_Genres_Decade]
+class DecadeSummary(BaseModel):
+    decades: list[TopGenresDecade]
 
     model_config = ConfigDict(from_attributes=True)
 
 
 
-class AI_Review_Analysis(BaseModel):
+class AIReviewAnalysis(BaseModel):
     movie: Movie
     sentiment_label: Optional[str]
     sentiment_score: Optional[float]
@@ -95,7 +95,7 @@ class MovieRecommendation(BaseModel):
     genre: str
     reason: str
 
-class Movie_Recs(BaseModel):
+class MovieRecs(BaseModel):
     mood: str
     recommendations: list[MovieRecommendation]
     
