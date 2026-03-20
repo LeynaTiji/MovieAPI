@@ -35,7 +35,14 @@ https://overflowing-success-production-57c0.up.railway.app/docs
 chmod +x setup.sh
 ./setup.sh
 
-#### To run API
+#### Run virtual environment
+##### On Windows
+.venv\Scripts\activate
+
+##### on Mac/Linux
+source .venv/bin/activate
+
+#### To run API, make sure you are in venv
 uvicorn app.main:app --reload
 
 #### To set up Anthropic API by creating an api key on Claude Platform

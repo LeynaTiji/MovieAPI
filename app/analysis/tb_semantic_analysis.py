@@ -1,5 +1,6 @@
 from textblob import TextBlob
 
+
 def review_semantics(reviews: list[str]):
 
     sentiment = []

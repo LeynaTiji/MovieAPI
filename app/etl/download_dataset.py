@@ -71,7 +71,7 @@ def load_dataset():
         db.add(movie)
         
         #store id map to link with reviews
-        movie_links[link] = movie
+        movie_links[link] = movie.link
 
     db.commit()
 
@@ -83,7 +83,7 @@ def load_dataset():
             continue
         
         movie_review = models.Review(
-            movie_link = movie_links[rt_link].link,
+            movie_link = movie_links[rt_link],
             review=clean(row.get("review_content")),
             critic_name = clean(row.get("critic_name")),
             score = clean(row.get("review_score")),
