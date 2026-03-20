@@ -11,7 +11,6 @@ def review_semantics(reviews: list[str]):
 
     sentiment = []
 
-    # code created referencing https://huggingface.co/blog/sentiment-analysis-python
     for r in reviews:
         # sentiment analysis
         response = requests.post(API_URL, headers=headers, json={"inputs": r})

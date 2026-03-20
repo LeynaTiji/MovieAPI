@@ -19,7 +19,7 @@ def test_register_returns_token(client):
     assert "access_token" in body
     assert body["token_type"] == "bearer"
 
-def test_register_missing_username(self, client):
+def test_register_missing_username(client):
     response = client.post("/register", json={
         "password": "testpassword"
     })
