@@ -7,7 +7,7 @@ python3 -m venv .venv
 
 # activate environment
 echo "Activating evironment..."
-source .venv/Scripts/activate
+source .venv/bin/activate
 
 # install dependencies
 echo "Installing dependencies..."

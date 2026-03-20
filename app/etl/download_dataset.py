@@ -2,8 +2,6 @@ import kagglehub
 import pandas as pd
 from app import models
 from app.database import SessionLocal
-# from dotenv import load_dotenv
-# load_dotenv(override=False)
 
 def clean(value):
     if pd.isna(value):
@@ -33,14 +31,14 @@ def load_dataset():
     #insert movie from dataset into db
     for _, row in movies_df.iterrows():
 
-        title = clean(row.get("movie_title")),
-        info = clean(row.get("movie_info")),
-        age = clean(row.get("content_rating")),
-        director = clean(row.get("directors")),
-        genre = clean(row.get("genres")),
-        authors = clean(row.get("authors")),
-        actors = clean(row.get("actors")),
-        link = clean(row.get("rotten_tomatoes_link")),
+        title = clean(row.get("movie_title"))
+        info = clean(row.get("movie_info"))
+        age = clean(row.get("content_rating"))
+        director = clean(row.get("directors"))
+        genre = clean(row.get("genres"))
+        authors = clean(row.get("authors"))
+        actors = clean(row.get("actors"))
+        link = clean(row.get("rotten_tomatoes_link"))
 
         #convert rating to string
         rating = str(row.get("audience_rating")) if pd.notna(row.get("audience_rating")) else None
@@ -86,9 +84,9 @@ def load_dataset():
         
         movie_review = models.Review(
             movie_link = movie_links[rt_link].link,
-            review=clean(row.get("review_content", "")),
-            critic_name = clean(row.get("critic_name", "")),
-            score = clean(row.get("review_score", "")),
+            review=clean(row.get("review_content")),
+            critic_name = clean(row.get("critic_name")),
+            score = clean(row.get("review_score")),
         )
 
         db.add(movie_review)

@@ -16,7 +16,7 @@ from app import models
 
 target_metadata = Base.metadata
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./movies.db")
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./.movies.db")
 
 # fix Railway postgres URL
 if DATABASE_URL.startswith("postgres://"):

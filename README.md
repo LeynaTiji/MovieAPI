@@ -17,7 +17,7 @@ https://overflowing-success-production-57c0.up.railway.app/docs
 
 ## Tech Stack
 - **FastAPI** — API framework
-- **SQLAlchemy** — ORM and database management
+- **SQLAlchemy and Psycog** — ORM and database management
 - **SQLite** — database
 - **TextBlob** — sentiment analysis
 - **Anthropic AI** — AI recommendations
@@ -26,7 +26,8 @@ https://overflowing-success-production-57c0.up.railway.app/docs
 - **pytest** — testing
 
 
-### How to initiate set up
+### How to set up locally
+
 ##### On Windows
 ./setup.bat
 
@@ -36,6 +37,12 @@ chmod +x setup.sh
 
 #### To run API
 uvicorn app.main:app --reload
+
+#### To set up Anthropic API by creating an api key on Claude Platform
+#### Run
+copy .env-example .env
+#### Then add your own unique api key from Claude and paste it instead of 'your-api-here'
+#### You will be able to interact with Claude api through the recommendations endpoint 
 
 ### To run unit tests
 pytest
