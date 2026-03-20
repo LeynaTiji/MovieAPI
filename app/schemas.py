@@ -2,16 +2,16 @@ from pydantic import BaseModel, ConfigDict
 from typing import Optional, List
 
 class MovieBase(BaseModel):
-    title: Optional[str]
-    info: Optional[str]
-    rating: Optional[str]
-    age: Optional[str]
-    genre: Optional[str]
-    director: Optional[str]
-    authors: Optional[str]
-    actors: Optional[str]
-    year: Optional[int]
-    link: Optional[str]
+    title: Optional[str] = None
+    info: Optional[str] = None
+    rating: Optional[str] = None
+    age: Optional[str] = None
+    genre: Optional[str] = None
+    director: Optional[str] = None
+    authors: Optional[str] = None
+    actors: Optional[str] = None
+    year: Optional[int] = None
+    link: Optional[str] = None 
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -26,20 +26,20 @@ class Movie(MovieCreate):
 
 
 class ReviewBase(BaseModel):
-    critic_name: Optional[str]
-    movie_link: Optional[str]
-    score: Optional[str]
-    review: Optional[str]
-
-    model_config = ConfigDict(from_attributes=True)
-
-class Review(ReviewBase):
-    id: int
+    critic_name: Optional[str] = None
+    movie_link: Optional[str] = None
+    score: Optional[str] = None
+    review: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 
 class ReviewCreate(ReviewBase):
     movie_id: int
+
+class Review(ReviewBase):
+    id: int
+    
+    model_config = ConfigDict(from_attributes=True)
 
 class Movie_Review(Movie):
     

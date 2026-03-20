@@ -106,5 +106,10 @@ def setup_database():
 # configure client to test db
 @pytest.fixture
 def client(setup_database):
+    db = TestingSessionLocal()
+    db.query(models.Review).delete()
+    db.commit()
+    db.close()
+
     with TestClient(app) as client:
         yield client

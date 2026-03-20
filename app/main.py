@@ -230,10 +230,11 @@ def create_review(review: schemas.ReviewCreate,
     if not movie:
         raise HTTPException(status_code=404, detail="Movie not found")
     
-    db_review = models.Review(**review.model_dump())
+    db_review = models.Review(**review.model_dump(exclude={"movie_id"}))
     db.add(db_review)
     db.commit()
     db.refresh(db_review)
+    return db_review
 
 # update a review by id
 @app.put("/reviews/by-review-id", response_model=schemas.Review)
@@ -243,7 +244,7 @@ def update_review(review: schemas.ReviewCreate, review_id: int = Query(..., desc
         raise HTTPException(status_code=404, detail="Review not found")
     
     # setattr to automatically update each field
-    for field, value in review.model_dump().items():
+    for field, value in review.model_dump(exclude={"movie_id"}).items():
         setattr(review, field, value)
     
     db.commit()
