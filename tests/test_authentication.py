@@ -113,3 +113,17 @@ def test_protected_endpoint_with_invalid_token(client):
         headers={"Authorization": "Bearer invalidtoken123"}
     )
     assert response.status_code == 401
+
+def test_update_requires_auth(client):
+    response = client.put("/reviews/by-review-id?review_id=1", json={
+        "movie_id": 1,
+        "critic_name": "Updated",
+        "movie_link": "m/test_movie",
+        "score": "9/10",
+        "review": "Updated review"
+    })
+    assert response.status_code == 401
+
+def test_delete_requires_auth(client):
+    response = client.delete("/reviews/by-review-id?review_id=1")
+    assert response.status_code == 401
