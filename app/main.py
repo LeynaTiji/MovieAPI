@@ -1,26 +1,51 @@
 from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from .database import SessionLocal, engine, Base
+from .database import SessionLocal, engine, Base, get_db
 
 from typing import Optional
 from collections import defaultdict
 
-from . import models, schemas
+from . import models, schemas, auth
 from .analysis import hf_semantic_analysis, genre_analysis, reccomendations
 
 app = FastAPI()
 
 Base.metadata.create_all(bind=engine)
 
-# create and manage database session
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-          
+# user registers sucessfully and recieves a unique token
+@app.post("/register", response_model=schemas.Token)
+def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    already_user = db.query(models.User).filter(models.User.username == user.username).first()
+
+    if already_user:
+        raise HTTPException(status_code=400, detail="Username is taken")
+    
+    db_user = models.User(
+        username=user.username,
+        hashed_password=auth.hash_password(user.password)
+    )
+    db.add(db_user)
+    db.commit()
+
+    token = auth.create_token({"sub": user.username})
+    return {"access_token": token, "token_type": "bearer" }
+
+# user logs in 
+@app.post("/login", response_model=schemas.Token)
+def login(input: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.username == input.username).first()
+    verified = auth.verify_password(input.password, user.hashed_password)
+    if not user :
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
+    
+    if not verified:
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
+    
+    token = auth.create_token({"sub": user.username})
+    return {"access_token": token, "token_type": "bearer"}
+
 #default endpoint
 @app.get("/")
 def root():
@@ -212,7 +237,9 @@ def get_reviews(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
 #create a review by id
 @app.post("/reviews", response_model=schemas.Review)
 def create_review(review: schemas.ReviewCreate,
-                  db: Session = Depends(get_db)):
+                  db: Session = Depends(get_db),
+                  current_user: models.User = Depends(auth.get_current_user)):
+
     # check movie exists 
     movie = db.query(models.Movie).filter(
         models.Movie.id == review.movie_id
@@ -228,7 +255,11 @@ def create_review(review: schemas.ReviewCreate,
 
 # update a review by id
 @app.put("/reviews/by-review-id", response_model=schemas.Review)
-def update_review(review: schemas.ReviewCreate, review_id: int = Query(..., description="Review ID"), db: Session = Depends(get_db)):
+def update_review(review: schemas.ReviewCreate, 
+                  review_id: int = Query(..., description="Review ID"), 
+                  db: Session = Depends(get_db),
+                  current_user: models.User = Depends(auth.get_current_user)):
+    
     db_review = db.query(models.Review).filter(models.Review.id == review_id).first()
     if not db_review:
         raise HTTPException(status_code=404, detail="Review not found")
@@ -243,7 +274,10 @@ def update_review(review: schemas.ReviewCreate, review_id: int = Query(..., desc
 
 # delete a review by id
 @app.delete("/reviews/by-review-id")
-def delete_review(review_id: int = Query(..., description="Review ID"), db: Session = Depends(get_db)):
+def delete_review(review_id: int = Query(..., description="Review ID"), 
+                  db: Session = Depends(get_db),
+                  current_user: models.User = Depends(auth.get_current_user)):
+    
     review = db.query(models.Review).filter(models.Review.id == review_id).first()
     if not review:
         raise HTTPException(status_code=404, detail="Review not found")

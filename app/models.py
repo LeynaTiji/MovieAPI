@@ -30,4 +30,9 @@ class Review(Base):
     review = Column(String, index=True)
     movie = relationship("Movie", back_populates="reviews")
 
+class User(Base):
+    __tablename__ = "users"
 
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True)
+    hashed_password = Column(String)

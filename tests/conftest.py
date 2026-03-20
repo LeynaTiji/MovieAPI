@@ -106,6 +106,18 @@ def setup_database():
 # configure client to test db
 @pytest.fixture
 def client(setup_database):
-
+    db = TestingSessionLocal()
+    db.query(models.User).delete()
+    db.commit()
     with TestClient(app) as client:
         yield client
+
+# register a test user and get token
+@pytest.fixture
+def auth_headers(client):
+    response = client.post("/register", json={
+        "username": "crudtestuser",
+        "password": "testpassword"
+    })
+    token = response.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
