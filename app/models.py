@@ -7,15 +7,15 @@ class Movie(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
-    info = Column(String, index=True)
-    age = Column(String, index=True)
-    genre = Column(String, index=True)
-    director = Column(String, index=True)
-    authors = Column(String, index=True)
-    actors = Column(String, index=True)
-    rating = Column(String, index=True)
+    info = Column(String)
+    age = Column(String)
+    genre = Column(String)
+    director = Column(String)
+    authors = Column(String)
+    actors = Column(String)
+    rating = Column(String)
     year = Column(Integer, index=True)
-    link = Column(String, index=True)
+    link = Column(String, unique=True, index=True)
 
     reviews = relationship("Review", back_populates="movie")
 

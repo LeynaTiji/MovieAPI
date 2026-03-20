@@ -2,6 +2,13 @@ import kagglehub
 import pandas as pd
 from app import models
 from app.database import SessionLocal
+# from dotenv import load_dotenv
+# load_dotenv(override=False)
+
+def clean(value):
+    if pd.isna(value):
+        return None
+    return value
 
 def load_dataset():
 
@@ -25,15 +32,19 @@ def load_dataset():
     movie_links = {}
     #insert movie from dataset into db
     for _, row in movies_df.iterrows():
-        title = row.get("movie_title") or None
-        info = row.get("movie_info") or None
-        age = row.get("content_rating") or None
-        director = row.get("directors") or None
-        genre = row.get("genres") or None
-        authors = row.get("authors") or None
-        actors = row.get("actors") or None
-        rating = row.get("audience_rating") or None
-        link = row.get("rotten_tomatoes_link") or None
+
+        title = clean(row.get("movie_title")),
+        info = clean(row.get("movie_info")),
+        age = clean(row.get("content_rating")),
+        director = clean(row.get("directors")),
+        genre = clean(row.get("genres")),
+        authors = clean(row.get("authors")),
+        actors = clean(row.get("actors")),
+        link = clean(row.get("rotten_tomatoes_link")),
+
+        #convert rating to string
+        rating = str(row.get("audience_rating")) if pd.notna(row.get("audience_rating")) else None
+
 
         #convert date into just year integer
         date = row.get("original_release_date")
@@ -42,6 +53,8 @@ def load_dataset():
                 year = pd.to_datetime(date).year
             except:
                 year = None
+        else:
+            year = None
 
         movie = models.Movie(
             title = title,
@@ -60,10 +73,9 @@ def load_dataset():
         db.add(movie)
         
         #store id map to link with reviews
-        movie_links[link] = movie.link
+        movie_links[link] = movie
 
     db.commit()
-    db.refresh(movie)
 
     # iterate through reviews csv
     for _, row in reviews_df.iterrows():
@@ -73,16 +85,16 @@ def load_dataset():
             continue
         
         movie_review = models.Review(
-            movie_link = movie_links[rt_link],
-            review=row.get("review_content", "") or None,
-            critic_name = row.get("critic_name", "") or None,
-            score = row.get("review_score", "") or None,
+            movie_link = movie_links[rt_link].link,
+            review=clean(row.get("review_content", "")),
+            critic_name = clean(row.get("critic_name", "")),
+            score = clean(row.get("review_score", "")),
         )
 
         db.add(movie_review)
 
+
     db.commit()
-    db.refresh(movie_review)
 
     print("Dataset has loaded")
 

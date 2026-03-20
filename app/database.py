@@ -6,14 +6,19 @@ load_dotenv()
 
 
 #db location
-DATABASE_URL = "sqlite:///./movies.db"
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./.movies.db")
+print("DATABASE URL:", DATABASE_URL)
 
 #add postgress
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+# connect_args only needed for SQLite
+if DATABASE_URL.startswith("sqlite"):
+    engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+else:
+    engine = create_engine(DATABASE_URL)
 
 SessionLocal = sessionmaker(bind=engine)
 
