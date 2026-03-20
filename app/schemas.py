@@ -1,6 +1,10 @@
 from pydantic import BaseModel, ConfigDict
 from typing import Optional, List
 
+class UserCreate(BaseModel):
+    username: str
+    password: str
+
 class MovieBase(BaseModel):
     title: Optional[str] = None
     info: Optional[str] = None

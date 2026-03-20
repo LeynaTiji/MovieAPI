@@ -6,7 +6,7 @@ from .database import SessionLocal, engine, Base
 from typing import Optional
 from collections import defaultdict
 
-from . import models, schemas
+from . import models, schemas, auth
 from .analysis import hf_semantic_analysis, genre_analysis, reccomendations
 
 app = FastAPI()
@@ -20,6 +20,10 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+@app.post("/register")
+def register():
           
 #default endpoint
 @app.get("/")
