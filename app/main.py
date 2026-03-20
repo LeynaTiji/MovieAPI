@@ -41,10 +41,10 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
 @app.post("/login", response_model=schemas.Token)
 def login(input: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.username == input.username).first()
-    verified = auth.verify_password(input.password, user.hashed_password)
     if not user :
         raise HTTPException(status_code=401, detail="Incorrect username or password")
     
+    verified = auth.verify_password(input.password, user.hashed_password)
     if not verified:
         raise HTTPException(status_code=401, detail="Incorrect username or password")
     
