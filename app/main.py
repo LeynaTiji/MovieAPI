@@ -23,7 +23,21 @@ def get_db():
 
 
 @app.post("/register")
-def register():
+def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    already_user = db.query(models.User).filter(models.User.username == user.username).first()
+
+    if already_user:
+        raise HTTPException(status_code=400, detail="Username is taken")
+    
+    db_user = models.User(
+        username=user.username,
+        hashed_password=auth.hash_password(user.password)
+    )
+    db.add(db_user)
+    db.commit()
+
+    token = auth.create_token({"sub": user.username})
+    return {"access_token": token, "token_type": "bearer" }
           
 #default endpoint
 @app.get("/")
