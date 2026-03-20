@@ -1,21 +1,28 @@
 #!/bin/bash
 
+echo "Setting up Movie API..."
+
 # create a virtual environment
 python3 -m venv .venv
 
 # activate environment
-source .venv/bin/activate
-
-# upgrade pip
-pip install --upgrade pip
+echo "Activating evironment..."
+source .venv/Scripts/activate
 
 # install dependencies
+echo "Installing dependencies..."
 pip install -r requirements.txt
 
 # run alembic migrations
+echo "Updating alembic"
 alembic upgrade head
 
 #load dataset
+echo "Seeding database..."
 python -m app.etl.download_dataset
 
-echo "MovieAPI initialised sucessfully. To run API use uvicorn app.main:app --reload."
+echo "MovieAPI initialised sucessfully."
+
+#start server
+echo "Starting server..."
+uvicorn app.main:app --reload
