@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from .database import SessionLocal, engine, Base
+from .database import SessionLocal, engine, Base, get_db
 
 from typing import Optional
 from collections import defaultdict
@@ -13,14 +13,6 @@ from .analysis import hf_semantic_analysis, genre_analysis, reccomendations
 app = FastAPI()
 
 Base.metadata.create_all(bind=engine)
-
-# create and manage database session
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 # user registers sucessfully and recieves a unique token
 @app.post("/register", response_model=schemas.Token)
@@ -45,7 +37,10 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
 def login(input: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.username == input.username).first()
     verified = auth.verify_password(input.password, user.hashed_password)
-    if not user or not verified:
+    if not user :
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
+    
+    if not verified:
         raise HTTPException(status_code=401, detail="Incorrect username or password")
     
     token = auth.create_token({"sub": user.username})

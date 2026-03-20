@@ -7,8 +7,6 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 
-
-
 # logic implemented with help from https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/#hash-and-verify-the-passwords
 
 SECRET_KEY = "7-secret6-extrem3kly-83y"
