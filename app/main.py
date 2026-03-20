@@ -245,7 +245,7 @@ def update_review(review: schemas.ReviewCreate, review_id: int = Query(..., desc
     
     # setattr to automatically update each field
     for field, value in review.model_dump(exclude={"movie_id"}).items():
-        setattr(review, field, value)
+        setattr(db_review, field, value)
     
     db.commit()
     db.refresh(db_review)
