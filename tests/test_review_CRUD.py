@@ -70,5 +70,16 @@ def test_update_review_missing_id(client):
     })
     assert response.status_code == 422
 
+def test_delete_review_returns_200(client):
+    response = client.delete("/reviews/by-review-id?review_id=3")
+    assert response.status_code == 200
+    assert "Review 3 deleted successfully" in response.json()["message"]
 
+def test_delete_review_not_found(client):
+        response = client.delete("/reviews/by-review-id?review_id=999")
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Review not found"
 
+def test_delete_review_missing_id(client):
+        response = client.delete("/reviews/by-review-id")
+        assert response.status_code == 422
