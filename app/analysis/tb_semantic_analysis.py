@@ -17,5 +17,5 @@ def review_semantics(reviews: list[str]):
 
     label = "POSITIVE" if average_score > 0 else "NEGATIVE"
 
-    return label, abs(average_score)
+    return label, round(average_score, 2)
 
