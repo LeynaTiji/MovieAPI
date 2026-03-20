@@ -24,3 +24,9 @@ def test_register_missing_username(client):
         "password": "testpassword"
     })
     assert response.status_code == 422
+
+def test_register_missing_password(client):
+    response = client.post("/register", json={
+        "username": "newuser"
+    })
+    assert response.status_code == 422
