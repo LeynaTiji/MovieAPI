@@ -10,7 +10,7 @@ from typing import Optional
 from collections import defaultdict
 
 from . import models, schemas, auth
-from .analysis import hf_semantic_analysis, genre_analysis, reccomendations
+from .analysis import genre_analysis, reccomendations, tb_semantic_analysis
 
 # code implemented with help from https://fastapi-mcp.tadata.com/getting-started/welcome
 app = FastAPI()
@@ -352,8 +352,8 @@ def get_movies_id(movie_link: str = Query(..., description="Rotten Tomatoes Movi
 
 # semantic analysis of reviews for specified movie
 @app.get("/reviews/semantics/by-link", 
-        summary="Gets overall semantics of reviews for a fil",
-        description="Gets overall semantic label and score of a film using NLP and movie link",
+        summary="Gets overall semantics of reviews for a film",
+        description="Gets overall semantic label and score of a film using textblob NLP and movie link",
         response_model=schemas.AIReviewAnalysis)
 def get_review_semantics(movie_link: str = Query(..., description="Rotten Tomatoes Movie Link"), db: Session = Depends(get_db)):
     reviews = db.query(models.Review).filter(
@@ -373,7 +373,7 @@ def get_review_semantics(movie_link: str = Query(..., description="Rotten Tomato
     #iterate through reviews to get review text
     review_texts = [r.review for r in reviews if r.review is not None]
 
-    label, score = hf_semantic_analysis.review_semantics(review_texts)
+    label, score = tb_semantic_analysis.review_semantics(review_texts)
 
     return schemas.AIReviewAnalysis(
         movie=movie,

@@ -1,6 +1,6 @@
 from unittest.mock import patch
 from app.main import app
-from app.analysis import hf_semantic_analysis, reccomendations
+from app.analysis import reccomendations
 from fastapi.testclient import TestClient
 
 client = TestClient(app)
