@@ -11,7 +11,7 @@ print("DATABASE URL:", DATABASE_URL)
 
 #add postgress
 if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
 
 
 # connect_args only needed for SQLite
