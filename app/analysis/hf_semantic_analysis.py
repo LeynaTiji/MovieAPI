@@ -1,10 +1,11 @@
-from transformers import pipeline
+import os
+import requests
+
+API_URL = "https://api-inference.huggingface.co/models/distilbert-base-uncased-finetuned-sst-2-english"
+
+headers = {"Authorization": f"Bearer {os.getenv('HF_API_KEY')}"}
 
 # code created referencing https://huggingface.co/blog/sentiment-analysis-python
-
-# load bart model
-
-sentiment_model = pipeline("sentiment-analysis", model="distilbert/distilbert-base-uncased-finetuned-sst-2-english")
 
 def review_semantics(reviews: list[str]):
 
