@@ -3,8 +3,11 @@ A RESTful movie API that provides movie recommendation endpoints using Anthropic
 
 ## Live Deployment
 https://overflowing-success-production-57c0.up.railway.app/
+
 ### Access Api Docs
 https://overflowing-success-production-57c0.up.railway.app/docs
+#### Full PDF version of API Document
+[API Documentation](docs/api_documentation.pdf)
 
 
 ## Features
